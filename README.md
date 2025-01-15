@@ -6,10 +6,10 @@ Welcome to the GitHub repository for advanced vSphere Supervisor documentation! 
 ## Advanced Documentation
 * [Supervisor Deployment Guide for Air-Gapped Environments](/air-gapped)
 * Supervisor Troubleshooting Resources
-  * [Supervisor Troubleshooting Guide](/supervisor-troubleshooting/README.md)
-  * [VKS Troubleshooting Guide](/vks-troubleshooting/README.md)
-  * [VM Service Troubleshooting Guide](/vm-service-troubleshooting/README.md)
+  * [Supervisor Troubleshooting Guide](/supervisor-troubleshooting)
+  * [VKS Troubleshooting Guide](/vks-troubleshooting)
+  * [VM Service Troubleshooting Guide](/vm-service-troubleshooting)
   * others
-* [NSX Requirements for Supervisor](/nsx-requirements/README.md)
+* [NSX Requirements for Supervisor](/nsx-requirements)
 
 
