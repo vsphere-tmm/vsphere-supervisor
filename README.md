@@ -4,7 +4,7 @@ Welcome to the GitHub repository for advanced vSphere Supervisor documentation! 
 
 
 ## Advanced Documentation
-* [Supervisor Deployment Guide for Air-Gapped Environments](/air-gapped/README.md)
+* [Supervisor Deployment Guide for Air-Gapped Environments](/air-gapped)
 * Supervisor Troubleshooting Resources
   * [Supervisor Troubleshooting Guide](/supervisor-troubleshooting/README.md)
   * [VKS Troubleshooting Guide](/vks-troubleshooting/README.md)
