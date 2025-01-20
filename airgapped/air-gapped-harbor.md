@@ -1,9 +1,9 @@
 # Addendum: Air-Gapped deployment using Harbor Supervisor Service
 
-## In this document we will only capture the additional steps and/or differences that have not been addressed in the [primary air gap install document](/airgapped/air-gapped.md) 
+## In this document, we will only capture the additional steps and/or differences that have not been addressed in the [primary air gap install document](/airgapped/air-gapped.md) 
 
 ## Introduction
-In certain scenarios, we may not have an Enterprise registry available for the platform deployment. In such a scenario, we can deploy Harbor Supervisor Service to perform most of the functionalities of an Enterprise registry. The process involves the following significant steps:
+We may not have an Enterprise registry available for the platform deployment in certain scenarios. In such a scenario, we can deploy Harbor Supervisor Service to perform most of the functionalities of an Enterprise registry. The process involves the following significant steps:
 
 - Copy the relevant files and binaries to be moved to the air-gapped environment.
 - Enable the Supervisor.
@@ -17,16 +17,16 @@ In certain scenarios, we may not have an Enterprise registry available for the p
 - Deploy the VKS Cluster(s).
 - Deploy the Tanzu Packages on the VKS Cluster(s).
 
-The data flow of packages, binaries and images between the internet connected and air-gapped environment can be summerised by the image below -
+The data flow of packages, binaries, and images between the internet-connected and air-gapped environment can be summarized by the picture below -
 
 ![image](/airgapped/harbor-dataflow.png)
 
-## Terminiology
-* **Bootstrap registry** An OCI compliant Harbor registry that is deployed on the vCenter that will have the Supervisor(s) enabled. This Harbor registry will be used exclusively to upload the binaries necessary to enable Contour and Harbor Supervisor services. It will not be utilized for any other purpose.
+## Terminology
+* **Bootstrap registry** An OCI-compliant Harbor registry will be deployed on the vCenter. This registry will be used exclusively to upload the binaries necessary to enable Contour and Harbor Supervisor services on the Supervisor. It will not be utilized for any other purpose.
 * **Platform registry** A Harbor Supervisor Service that performs all functionalities of an Enterprise grade Platform registry. 
 
 ## Bill of Materials
-Besides the BOM referenced in the primary air-gapped document, we will be leveraging the following additional componenets - 
+Besides the BOM referenced in the primary air-gapped document, we will be leveraging the following additional components - 
 
 |Component|Version|Sample Hostname|
 |---------|-------|----------------------------------|
@@ -34,13 +34,13 @@ Besides the BOM referenced in the primary air-gapped document, we will be levera
 |Platform/Enterprise Registry|Harbor v2.9.1|registry1.env1.lab.test|
 
 ## 1. Download all required Plugins, Binaries, and Images
-Besides downloading all the plugins, binaries and images addressed in the primary air-gapped document -
+Besides downloading all the plugins, binaries, and images addressed in the primary air-gapped document -
 
 ### 1e. Download Bitnami Harbor OVA
 Before enabling Supervisor Services in an air-gapped environment, we must host images in a bootstrap container registry. This bootstrap repository will be used exclusively to host the necessary images to enable Contour and Harbor Supervisor Services; it will not be utilized for any other purpose. The Debian-based Bitnami Harbor OVA (v2.12.2) can be downloaded from the [Bitnami portal](https://bitnami.com/redirect/to?from=%2Fstack%2Fharbor%2Fvirtual-machine&url=https%3A%2F%2Fmarketplace.cloud.vmware.com%2Fservices%2Fdetails%2Fharbor-singlevm%3Fslug%3Dtrue). 
 
 ### 1f. Download Trivy Database for Platform Registry (Harbor Supervisor Service)
-Trivy vulnerability scanning database is available for download from gcr.io, updated periodically. In an air-gapped environment, this database must be periodically downloaded to the Bootstrap machine and then moved to the air-gapped environment to be installed on the Platform container registry (Harbor Supervisor Service). 
+The Trivy vulnerability scanning database is available for download from gcr.io and is updated periodically. In an air-gapped environment, this database must be periodically downloaded to the Bootstrap machine and then moved to the air-gapped environment to be installed on the Platform container registry (Harbor Supervisor Service). 
 
 ```bash
 TRIVY_TEMP_DIR=$(mktemp -d)
@@ -64,16 +64,15 @@ trivy --cache-dir $TRIVY_TEMP_DIR image --download-db-only
 ```
 
 ### Summary
-Copy **these additional files** to the Admin machine within the air-gapped enviornment. 
-
+Copy **these additional files** to the Admin machine within the air-gapped environment. 
 
 ## Complete Steps 2, 3, 4 and 5 referenced in the primary air-gapped document
 
 ## Deploy Bootstrap registry
-The Bitnami Harbor appliance deploys the Harbor service on port 80 by default. This needs to be modified to start the Harbor service on port 443. Additional configuration changes need to be performed. It is recommended that these steps be performed on the Admin Host. 
+The Bitnami Harbor appliance deploys the Harbor service on port 80 by default. This needs to be modified to start the Harbor service on port 443. Additional configuration changes need to be performed. These steps would be best to perform on the Admin Host. 
 
 ### Create Self Signed Certificates for the Bootstrap registry 
-Using the `openssl` command, generate the requried CA and certificate files on the Admin host. You can modify the reference to the Bootstrap registry hostname and IP address as per your enviornment's requreiments. 
+Using the `openssl` command, generate the required CA and certificate files for the Admin host. You can modify the reference to the Bootstrap registry hostname and IP address per your environment's requirements. 
 
 ```bash
 ## Generate CA key pair. Modify as needed
@@ -149,7 +148,7 @@ sudo /opt/bitnami/ctlscript.sh restart bitnami.nginx
 * The value of `keytext`  has to be updated with the contents of `registory0.key` (including `-----BEGIN PRIVATE KEY-----` and ending with `-----END PRIVATE KEY-----`). 
 * If the above process was not used to generate the self-signed certificates and key files, the contents can be replaced with the user-provided certificate and key file. 
 
-Once the above file has been successfully created, run the following command to encode (BASE64) it and copy its contents.  
+Once the above file has been successfully created, please run the following command to encode (BASE64) it and copy its contents.  
 
 ```bash
 ## IMPORTANT to BASE64 encode this file
@@ -164,7 +163,7 @@ Deploying the Bitnami Harbor OVA follows the same process as deploying any other
 
 ![image](/airgapped/bitnami0.png)
 
-Once Harbor is deployed and running, we can grab the default credentials from the VM’s console. SSH into the VM using the `bitnami` user and update the credentials using a secure password. Login to the Harbor UI using the `admi`n user and the password provided, and update the credentials using a secure password. See the example below - 
+Once Harbor is deployed and running, we can grab the default credentials from the VM’s console. SSH into the VM using the `bitnami` user and update the credentials using a secure password. Login to the Harbor UI using the `admin` user and the password provided, and update the credentials using a secure password. See the example below - 
 
 ![image](/airgapped/bitnami1.png)
 
@@ -173,7 +172,7 @@ The Supervisor must trust the Bootstrap registry certificate. To perform this st
 
 ![image](/airgapped/add-cert2.png)
 
-Input the Registry host URL, TLS Certificate of the registry (content of `registry0.crt`), Username, and Password. Note that while the UI states that the Username and Password are optional, they are currently mandatory.
+Input the Registry host URL, TLS Certificate of the registry (the content of `registry0.crt`), Username, and Password. Note that while the UI states that the Username and Password are optional, they are currently mandatory.
 
 ![image](/airgapped/add-cert3.png)
 
@@ -207,10 +206,10 @@ Login Succeeded
 ```
 
 ### Upload Harbor and Contour Supervisor Services to the Enterprise Registry
-Create a projects `sup-services`, with public access, within the Bootstrap registry to upload Contour and Harbor Supervisor Servics that needs to be installed on the Supervisor.
+Create a project, `sup-services,` with public access within the Bootstrap registry to upload Contour and Harbor Supervisor Services that must be installed on the Supervisor.
 
 
-The Contour and Harbor Supervisor Servics image bundle binaries that were downloaded in Step 1d, must now be uploaded to the Bootstrap Harbor registry. Follow the [steps 4 and 5 from the official documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/deploying-supervisor-services-from-a-private-container-image-registry/relocate-supervisor-services-to-a-private-registry.html) to complete this critical step. While the official documentation refers to the `imgpkg` binary to perform the download function, the Tanzu CLI's `imgpkg plugin` performs the identical function. 
+The Contour and Harbor Supervisor Services image bundle binaries downloaded in Step 1d must now be uploaded to the Bootstrap Harbor registry. Follow [steps 4 and 5 from the official documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/deploying-supervisor-services-from-a-private-container-image-registry/relocate-supervisor-services-to-a-private-registry.html) to complete this critical step. While the official documentation refers to the `imgpkg` binary to perform the download function, the Tanzu CLI's `imgpkg plugin` performs the identical function. 
 
 ```bash
 ## Sample Commands
@@ -219,7 +218,7 @@ tanzu imgpkg copy --tar harbor-v2.9.1.tar   --to-repo registry0.env1.lab.test/su
 
 ```
 
-Additionally, the corrosponding Contour and Harbor Supervisor Service YAMsL needs to be updated with the new Bootstrap registry valid location -
+Additionally, the corresponding Contour and Harbor Supervisor Service YAMsL needs to be updated with the new Bootstrap registry valid location -
 
 ```yaml
 # Contour.yaml
@@ -243,14 +242,14 @@ template:
 ...
 ```
 
-Once completed, add the requried Supervisor Services to the Supervisor using the [steps provided in the documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/deploying-supervisor-services-from-a-private-container-image-registry/install-and-use-the-supervisor-service.html).
+Once completed, add the required Supervisor Services to the Supervisor using the [steps provided in the documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/deploying-supervisor-services-from-a-private-container-image-registry/install-and-use-the-supervisor-service.html).
 
 ## Install Contour and Harbor Supervisor Service to be used as Platform Registry
 
-Folow the directions to install COntour and Harbor as as Supervisor Service provided [here](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/installing-and-configuring-harbor-and-contour.html). 
+Follow the directions to install Contour and Harbor as Supervisor Service provided [here](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/installing-and-configuring-harbor-and-contour.html). 
 
 ### Harbor customization
-For an air-gapped install, we have to disable Trivy scanner from trying to update its database from the internet. To do so, we need to append the follwing section at the end of the sample `harbor-data-values.yml` file. 
+For an air-gapped install, we have to disable the Trivy scanner from trying to update its database from the internet. To do so, we must append the following section at the end of the sample `harbor-data-values.yml` file. 
 
 ```yaml
 # harbor-data-values.yml
@@ -261,8 +260,5 @@ trivy:
   offlineScan: true
 ```
 ---
-## Complete Steps 6, 7 and 8 referenced in the primary air-gapped document.
-While completeing these steps, replace the reference to the Enterprise Registry with the Platform registry (Harbor Supervisor Service)
-
-
-Additional [documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/installing-and-configuring-harbor-and-contour.html)
+## Complete Steps 6, 7, and 8 referenced in the primary air-gapped document.
+While completing these steps, replace the reference to the Enterprise Registry with the Platform Registry (Harbor Supervisor Service)
