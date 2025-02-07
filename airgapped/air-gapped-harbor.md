@@ -10,8 +10,8 @@ We may not have an Enterprise registry available for the platform deployment in 
 - Upload Kubernetes release OVAs to a Content Library.
 - Create vSphere Namespace(s) for VKS Clusters(s).
 - Configure the air-gapped Admin host in the air-gapped environment. 
-- **Deploy Bootstrap registry. (NEW)**
-- **Install Contour and Harbor Supervisor Service to be used as Platform Registry (NEW)**
+- **(NEW) Deploy Bootstrap registry.**
+- **(NEW) Install Contour and Harbor Supervisor Service to be used as Platform Registry.**
 - Mirror Platform registry with the relevant container images to be used by the platform. 
 - Install the relevant Supervisor Services.
 - Deploy the VKS Cluster(s).
@@ -37,7 +37,7 @@ Besides the BOM referenced in the [primary air gap install document](/airgapped/
 Besides downloading all the plugins, binaries, and images addressed in the [primary air gap install document](/airgapped/air-gapped.md) -
 
 ### 1e. Download Bitnami Harbor OVA
-Before enabling Supervisor Services in an air-gapped environment, we must host images in a bootstrap container registry. This bootstrap repository will be used exclusively to host the necessary images to enable Contour and Harbor Supervisor Services; it will not be utilized for any other purpose. The Debian-based Bitnami Harbor OVA (v2.12.2) can be downloaded from the [Bitnami portal](https://bitnami.com/redirect/to?from=%2Fstack%2Fharbor%2Fvirtual-machine&url=https%3A%2F%2Fmarketplace.cloud.vmware.com%2Fservices%2Fdetails%2Fharbor-singlevm%3Fslug%3Dtrue). 
+Before enabling Supervisor Services in an air-gapped environment, we must host images in a bootstrap container registry. This bootstrap repository will be used exclusively to host the necessary images to enable Contour and Harbor Supervisor Services; it will not be utilized for any other purpose. The Debian-based Bitnami Harbor OVA (v2.12.2) can be downloaded from the [Bitnami portal](https://bitnami.com/redirect/to?from=%2Fstack%2Fharbor%2Fvirtual-machine&url=https%3A%2F%2Fmarketplace.cloud.vmware.com%2Fservices%2Fdetails%2Fharbor-singlevm%3Fslug%3Dtrue). The above link redirects to VMware Marketplace. Users must have a valid VMware/Broadcom CSP login and for the org to have the Marketplace tile enabled.
 
 ### 1f. Download Trivy Database for Platform Registry (Harbor Supervisor Service)
 The Trivy vulnerability scanning database is available for download from gcr.io and is updated periodically. In an air-gapped environment, this database must be periodically downloaded to the Bootstrap machine and then moved to the air-gapped environment to be installed on the Platform container registry (Harbor Supervisor Service). 
@@ -64,12 +64,12 @@ trivy --cache-dir $TRIVY_TEMP_DIR image --download-db-only
 ```
 
 ### Summary
-Copy **these additional files** to the Admin machine within the air-gapped environment. 
+Copy **these additional files** to the Admin host within the air-gapped environment. 
 
 ## Complete Steps 2, 3, 4, and 5 referenced in the [primary air gap install document](/airgapped/air-gapped.md)
 
 ## Deploy Bootstrap registry
-The Bitnami Harbor appliance deploys the Harbor service on port 80 by default. This needs to be modified to start the service on port 443. Additional configuration changes need to be made. These steps would be best performed on the Admin Host. 
+The Bitnami Harbor appliance deploys the Harbor service on port 80 by default. However, this needs to be modified to start the service on port 443. Additional configuration changes are also required. These steps would be best performed on the Admin Host. 
 
 ### Create Self Signed Certificates for the Bootstrap registry 
 Using the `openssl` command, generate the required CA and certificate files for the Admin host. You can modify the reference to the Bootstrap registry hostname and IP address according to your environment's requirements. 
@@ -98,7 +98,7 @@ EOF
 
 openssl x509 -req -sha512 -days 365 -extfile v3.ext -CA admin-ca.crt -CAkey admin-ca.key -CAcreateserial -in registry0.csr -out registry0.crt
 ```
-The above commands produces the following files :
+The above commands produce the following files :
 ```
 registry0.crt
 registry0.key
@@ -176,7 +176,7 @@ Input the Registry host URL, TLS Certificate of the registry (the content of `re
 ![image](/airgapped/add-cert3.png)
 
 ### Add the Bootstrap Registry certificate to the Admin host Trust Store
-Use the commands below to add the Bootstrap Harbor certificate to the Admin host trust store. 
+You can use the commands below to add the Bootstrap Harbor certificate to the Admin host trust store. 
 
 ```bash
 sudo cp registry0.crt /usr/local/share/ca-certificates 
@@ -222,9 +222,9 @@ Additionally, the corresponding Contour and Harbor Supervisor Service YAMsL need
 ```yaml
 # Contour.yaml
 ...
-template:
-  spec:
-    fetch:
+Template:
+  Spec:
+    Fetch:
     - imgpkgBundle:
         image: registry0.env1.lab.test/sup-services/contour:v1.24.4_vmware.1-tkg.1
 ...
@@ -233,9 +233,9 @@ template:
 ```yaml
 # harbor.yaml
 ...
-template:
-  spec:
-    fetch:
+Template:
+  Spec:
+    Fetch:
     - imgpkgBundle:
         image: registry0.env1.lab.test/sup-services/harbor:v2.9.1_vmware.1-tkg.1
 ...
@@ -256,7 +256,7 @@ For an air-gapped install, we have to disable the Trivy scanner from trying to u
 trivy:
   enabled: true
   skipUpdate: true
-  offlineScan: true
+  offline can: true
 ```
 ---
 ## Complete Steps 6, 7, and 8 referenced in the primary air-gapped document.
