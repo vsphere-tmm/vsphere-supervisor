@@ -8,7 +8,7 @@ The complete procedure to install a VKS cluster with additional Tanzu package ad
 - Upload Kubernetes release OVAs to a Content Library.
 - Create vSphere Namespace(s) for VKS Clusters(s).
 - Configure the air-gapped Admin host in the air-gapped environment. 
-- Mirror an Enterprise OCI registry with the relevant container images to be used by the platform. 
+- Mirror an Enterprise OCI registry with the relevant container images for the platform. 
 - Install the relevant Supervisor Services.
 - Deploy the VKS Cluster(s).
 - Deploy the Tanzu Packages on the VKS Cluster(s).
@@ -23,8 +23,8 @@ The data flow of packages, binaries, and images between the internet-connected a
 * **Tanzu CLI** A plugin-based CLI that is used to interact with the Supervisor and VKS clusters
 * **Tanzu Packages** Tanzu Packages enable administrators and users to add and manage standard services and add-ons on Kubernetes clusters using the Tanzu CLI or Carvel Custom Resources.
 
-## Prerequisite
-An Enterprise OCI-complaint registry is assumed to be available in the air-gapped environment and accessible by all platform nodes, including the admin machines. The registry must be accessible over HTTPS. The certificate can be signed by a trusted certificate authority or self-signed.  
+## Prerequisites
+An **Enterprise OCI-complaint registry** is assumed to be available in the air-gapped environment and accessible by all platform nodes, including the admin host. The registry must be accessible over HTTPS. The certificate can be signed by a trusted certificate authority or self-signed.  
 **Note** If an Enterprise registry is unavailable in the air-gapped environment, please visit this [document](/airgapped/air-gapped-harbor.md) to install and configure Harbor as Bootstrap and Platform registries.
 
 ## Bill of Materials
@@ -32,8 +32,8 @@ The table below provides sample hostnames and versions used throughout the docum
 
 |Component|Version|Sample Hostname (where applicable)|
 |---------|-------|----------------------------------|
-|Bastion Host|Ubuntu 24.04|bastion.internet.lab.test|
-|Admin Host (Air-gapped)|Ubuntu 24.04|admin.env1.lab.test|
+|Bastion Host|Ubuntu 24.04.4|bastion.internet.lab.test|
+|Admin Host (Air-gapped)|Ubuntu 24.04.4 (identical to the Bastion Host)|admin.env1.lab.test|
 |vCenter|8.0U3d|vcenter.env1.lab.test|
 |ESXi|8.0U3d|esxi[0..xxx].env1.lab.test|
 |Supervisor|v1.29|supervisor0.env1.lab.test|
@@ -41,6 +41,15 @@ The table below provides sample hostnames and versions used throughout the docum
 |TKC|v1.29.4/v1.30.1/v1.31.1|workload-vsphere-vks1|
 |Tanzu Package|v2024.8.21||
 |TKG Service|3.1.1||
+
+Additionally, it is crucial to have the following packages and binaries installed on both the Bastion and Admin Host - 
+* `wget`
+* `curl`
+* `docker` (Preferably from the Docker website [https://docs.docker.com/engine/install/])
+* `jq`
+* `yq` (Some Linux distributions come with their implementation of yq. These packages are not the latest and/or provide the full functionalities. The newest version of the yq package can be downloaded from [https://github.com/mikefarah/yq/releases])
+* `openssl` for certificate generation and validations. 
+* Additional troubleshooting and diagnostic tools as needed. 
 
 ## 1. Download all required Plugins, Binaries, and Images
 This document utilizes an Ubuntu 24.04.4-based Bastion host (**bastion.internet.lab.test**) for this stage. Below are the key plugins and packages that must be downloaded, each playing a critical role in the platform deployment process.
@@ -75,7 +84,7 @@ tanzu plugin group search -n vmware-vsphere/default --show-details
 tanzu plugin install --group vmware-vsphere/default:v8.0.3
 
 ## The required plugins get installed in `~/.local/share/tanzu-cli/`
-## Tar the files in this folder. 
+## Tar the files in this folder. Note the '.' at the end of the command.
 tar -czvf tanzu-cli-plugins.tar.gz -C ~/.local/share/tanzu-cli .
 ```
 
@@ -107,7 +116,7 @@ spec:
 ```
 For additional information and examples, please refer to [Steps 1, 2 and 3 of the official documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/deploying-supervisor-services-from-a-private-container-image-registry/relocate-supervisor-services-to-a-private-registry.html). While the official documentation refers to the `imgpkg` binary to perform the download function, the Tanzu CLI's `imgpkg plugin` performs the identical function. 
 
-#### E.g. Download Contour Supervisor Service Binaries and associated YAML files.
+####, E.g., Download Contour Supervisor Service Binaries and associated YAML files.
 When writing this document, the latest version of the Contour Supervisor Service is “v1.28.2”. Please refer to ​​the vSphere Supervisor Services page to check for the updated versions. Download the `contour.yml` and `contour-data-values.yml` files required for the Contour Supervisor Service. These files can be accessed through the vSphere Supervisor Services page. The `contour.yml` file can be obtained by selecting the appropriate Contour version, and the `contour-data-values.yml` can be downloaded from the "Contour Sample values.yaml" section in the same vSphere Supervisor Services page. Locate the value of the image from the `contour.yml` file as described above. 
 
 You can execute the following command from the Bastion host to download the image bundle as a tarball.
@@ -130,10 +139,10 @@ The table below provides the sample list of Supervisor Services that can be down
 |ArgoCD Operator|Experimental|v0.12.0|[argocd.yaml](https://raw.githubusercontent.com/vsphere-tmm/Supervisor-Services/refs/heads/main/supervisor-services-labs/argocd-operator/v0.12.0/argocd-operator.yaml)|[Sample values.yaml](https://github.com/vsphere-tmm/Supervisor-Services/blob/main/supervisor-services-labs/argocd-operator/v0.12.0/values.yaml)|
 
 ### Summary
-The following files, binaries, and packages have been successfully downloaded in this section, and **must be transferred to the Admin host**. 
+The following files, binaries, and packages have been successfully downloaded in this section and **must be transferred to the Admin host**. 
 * Kubernetes Release OVA files. 
-* Tanzu CLI (tanzu-cli-linux-amd64.tar.gz) 
-* Tanzu CLI vSphere Plugin (tanzu-cli-plugins.tar.gz)
+* Tanzu CLI (tanzu-cli-linux-amd64.tar.gz).
+* Tanzu CLI vSphere Plugin (tanzu-cli-plugins.tar.gz).
 * Tanzu Packages (tanzu-packages.tar). This file can be gzipped if needed. 
 * Supervisor Service packages and Yaml Files.
 
@@ -141,7 +150,7 @@ The following files, binaries, and packages have been successfully downloaded in
 Using the steps and directions in the official [documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/installing-and-configuring-vsphere-supervisor.html), configure the required networking, storage policies, and profiles and enable the Supervisor on `vcenter.env1.lab.test`.
 
 ## 3. Create a Kubernetes release content library and upload Kubernetes release images
-The Kubernetes release OVAs downloaded on the Bastion host and copied to the Admin host must be uploaded to a Content library within the vCenter. Before proceeding, a local content library must be created. The "Create a Local Content Library (for Air-Gapped Cluster Provisioning)" [docuentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/using-tkg-service-with-vsphere-supervisor/administering-kubernetes-releases-for-tkg-service-clusters/create-a-local-content-library-for-air-gapped-cluster-provisioning.html) provides instructions on creating and importing Kubernetes Release (Kr) images into the content library. **Step #12** provides details on files (downloaded previsouly in step 1a) that need to be uploaded to the local content library. 
+The Kubernetes release OVAs downloaded on the Bastion host and copied to the Admin host must be uploaded to a Content library within the vCenter. Before proceeding, a local content library must be created. The "Create a Local Content Library (for Air-Gapped Cluster Provisioning)" [docuentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/using-tkg-service-with-vsphere-supervisor/administering-kubernetes-releases-for-tkg-service-clusters/create-a-local-content-library-for-air-gapped-cluster-provisioning.html) provides instructions on creating and importing Kubernetes Release (Kr) images into the content library. **Step #12** provides details on files (downloaded previously in step 1a) that need to be uploaded to the local content library. 
 
 ## 4. Create vSphere Namespace(s) for VKS Clusters(s)
 If not already created, a vSphere namespace should be created. Refer to "[Configure a vSphere Namespace for Hosting TKG Service Clusters](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/using-tkg-service-with-vsphere-supervisor/configuring-vsphere-namespaces-for-hosting-tkg-service-clusters.html)" to configure the vSphere Namespace.
@@ -152,7 +161,7 @@ The Admin host (**admin.env1.lab.test**) is essential to the next deployment sta
 * Memory: 4 GB
 * Storage: 150–200 GB of free space
 
-Note: Before moving forward, verify that all the files mentioned in the Summary section in Step 1 have been successfully copied to the Admin host. 
+Note: Before moving forward, verify that all the files mentioned in the Summary section in Step 1 have been successfully copied to the Admin host.
 
 ### 5a. Download and Install kubectl and kubectl-vsphere CLI
 `kubectl` is the command-line tool used to interact with Kubernetes clusters. It allows users to manage and inspect resources within a Kubernetes environment. `kubectl-vsphere` is a VMware-specific plugin for `kubectl` that enables administrators and developers to interact with the Supervisor and manage VKS clusters running on vSphere. It integrates with the Supervisor and extends `kubectl` with commands specific to VMware's TKG Service.
@@ -202,7 +211,7 @@ tanzu plugin list
 If not logged in, log in to the Supervisor using the `kubectl-vsphere` plugin. 
 
 ```bash
-# Connect to vSphere Namespace using kubectl vsphere cli
+# Connect to vSphere Namespace using kubectl vsphere CLI
 kubectl vsphere login --vsphere-username <sso_username> --server=https://<SupervisorAPIEndpoint> --insecure-skip-tls-verify --tanzu-kubernetes-cluster-namespace <vsphere-namespace>
 
 ## Sample Command
@@ -210,9 +219,10 @@ kubectl vsphere login --vsphere-username administrator@vsphere.local --server=ht
 ```
 
 ### 5d. Add the Enterprise Registry certificate to the Admin host Trust Store (Optional)
-Now, we have to add the Enterprise registry certificate (E.g. contents saved in file `registry1.crt`) to the Admin machine trust store to ensure the Admin machine trusts the registry. This step is optional and required only when using a certificate not signed by a trusted Certificate authority (e.g., a self-signed certificate).
+To ensure the Admin machine trusts the registry, we must add the Enterprise registry certificate (E.g., the contents saved in file `registry1.crt`) to the Trust Store. This step is optional and required only when using a certificate not signed by a trusted Certificate authority (e.g., a self-signed certificate).
 
 ```bash
+## Ubuntu specific example
 sudo cp registry1.crt /usr/local/share/ca-certificates 
 sudo update-ca-certificates
 ```
@@ -247,8 +257,8 @@ Input the Registry host URL, TLS Certificate of the registry (the content of `re
 
 ## 7. Upload Packages to the Enterprise registry
 Create two projects/folders, with public access, within the registry to upload -
-* All the Supervisor Servies that need to be installed on the Supervisor. (e.g. `sup-services`). Depending on the registry vendor and version, the steps may vary.
-* The Tanzu Packages that will be installed on the VKS cluster. (e.g. `tanzu-packages`).  Depending on the registry vendor and version, the steps may vary.
+* All the supervisor services (e.g., `sup-services`) must be installed on the supervisor. The steps may vary depending on the registry vendor and version.
+* The Tanzu Packages will be installed on the VKS cluster. (e.g. `tanzu-packages`). The steps may vary depending on the registry vendor and version.
 
 ### 7a. Upload Tanzu Packages to the Enterprise Registry
 The Tanzu Package bundle, downloaded in Step 1c, must be uploaded to the Enterprise registry using the Tanzu CLI. 
@@ -259,7 +269,7 @@ tanzu imgpkg copy --tar tanzu-packages.tar --to-repo registry1.env1.lab.test/tan
 ```
 
 ### 7b. Upload Supervisor Services to the Enterprise Registry
-All the Supervisor Services image bundle binaries that were downloaded in Step 1d, must be uploaded to the Enterprise registry. Follow the [steps 4 and 5 from the official documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/deploying-supervisor-services-from-a-private-container-image-registry/relocate-supervisor-services-to-a-private-registry.html) to complete this critical step. While the official documentation refers to the `imgpkg` binary to perform the download function, the Tanzu CLI's `imgpkg plugin` performs the identical function. 
+All the Supervisor Services image bundle binaries downloaded in Step 1d must be uploaded to the Enterprise registry. Follow [steps 4 and 5 from the official documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/deploying-supervisor-services-from-a-private-container-image-registry/relocate-supervisor-services-to-a-private-registry.html) to complete this critical step. While the official documentation refers to the `imgpkg` binary to perform the download function, the Tanzu CLI's `imgpkg plugin` performs the identical function. 
 
 ```bash
 ## Sample Command
@@ -278,7 +288,7 @@ template:
         image: registry1.env1.lab.test/sup-services/contour:v1.24.4_vmware.1-tkg.1
 ...
 ```
-Perform these steps for all the Supervisor Services that were previously downloaded. Once completed, add the requried Supervisor Services to the Supervisor using the [steps provided in the documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/deploying-supervisor-services-from-a-private-container-image-registry/install-and-use-the-supervisor-service.html).
+Perform these steps for all the Supervisor Services that were previously downloaded. Once completed, add the required Supervisor Services to the Supervisor using the [steps provided in the documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/deploying-supervisor-services-from-a-private-container-image-registry/install-and-use-the-supervisor-service.html).
 
 ## 8. Deploy VKS Cluster(s)
 
@@ -349,7 +359,7 @@ kubectl describe cluster workload-vsphere-vks1 -n ns01
 ```
 
 ### 8d. Deploy Tanzu Package(s) on Workload Cluster
-Tanzu packages can be deployed from the Tanzu Standard repository using the Tanzu CLI from the Admin host. We will use `cert-manager` as an example to demonstrate the ease of deploying these packages. To install the cert-manager, we must first add the package repository to the VKS Cluster.
+Tanzu packages can be deployed from the Tanzu Standard repository using the Tanzu CLI from the Admin host. We will use `cert-manager` as an example to demonstrate the ease of deploying these packages. We must first add the package repository to the VKS Cluster to install the cert-manager.
 
 Login to VKS Cluster using the kubectl-vsphere CLI from the Admin machine
 ```bash
@@ -369,7 +379,7 @@ tanzu package repository add tanzu-standard --url <harbor-fqdn>/<project-name>/p
 tanzu package repository add tanzu-standard --url registry1.env1.lab.test/tanzu-packages/packages/standard/repo:v2024.5.16 --namespace tkg-system
 ```
 
-Ensure that the package repository is Reconciled successfully. 
+Ensure that the package repository is reconciled successfully. 
 ```bash
 tanzu package repository list -n tkg-system 
 
@@ -423,4 +433,4 @@ cert-manager-cainjector-575468965b-xrzf4   1/1     Running   0          54s
 cert-manager-webhook-567f6945f-8m8d6       1/1     Running   0          54s
 ```
 
-Note: In the sample commands provided, the cert-manager application will be deployed in the mypackages namespace, with all required pods created in the `cert-manager` namespace. If a namespace named `cert-manager` already exists, the package deployment will use that existing namespace. If the package installation fails, label the `cert-manager` namespace with `pod-security.kubernetes.io/enforce=privileged` and delete all the ReplicaSets under the `cert-manager` namespace. This will prompt the deployment to recreate the ReplicaSets and the necessary pods.
+Note: In the sample commands provided, the cert-manager application will be deployed in the `namespaceName` namespace, with all required pods created in the `cert-manager` namespace. If a namespace named `cert-manager` already exists, the package deployment will use that existing namespace. If the package installation fails, label the `cert-manager` namespace with `pod-security.kubernetes.io/enforce=privileged` and delete all the ReplicaSets under the `cert-manager` namespace. This will prompt the deployment to recreate the ReplicaSets and the necessary pods.
