@@ -254,6 +254,17 @@ You can also perform Streaming Logs of the Supervisor Control Plane to a Remote 
 
 ## Appendix
 
+### Collecting a Support Bundle for Supervisor
+You can export the supervisor logs to troubleshoot Supervisor and VKS cluster errors. Typically, such logs are reviewed in consultation with VMware Support.
+* Log in to your vSphere IaaS control plane environment using the vSphere Client.
+* Select Menu > Workload Management.
+* Select the Supervisor tab.
+* Select the target Supervisor instance.
+* Click `Export Logs`.
+
+Refer [Gathering Logs for vSphere with Tanzu](https://kb.vmware.com/s/article/96617) for more information.
+
+
 ### Namespace details on Supervisor
 
 Below is the list of namespaces created on the Supervisor node after the clusters are successfully installed. These are the default namespaces on Kubernetes version 1.29. 
