@@ -2,11 +2,11 @@
 
 This document captures the troubleshooting resources for the VKS cluster (workload cluster formally known as the TKGs cluster), which is part of our VMware Cloud Foundation (VCF) offering. It is based on the vSphere 8.0U3 and VMware Cloud Foundation 5.2 releases, and we heavily leverage our [existing troubleshooting documents](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/7-0/vsphere-with-tanzu-configuration-and-management-7-0/troubleshooting-vsphere-with-kubernetes.html) here. Checking release-specific documentation is recommended, given that some troubleshooting approaches and commands may change in future releases. 
 
-# Workload cluster Troubleshooting
+# VKS cluster Troubleshooting
 
-## Accessing Workload clusters
+## Accessing VKS clusters
 
-There are multiple approaches to accessing the workload clusters. Here are some of the most commonly used ones. 
+There are multiple approaches to accessing the VKS clusters. Here are some of the most commonly used ones. 
 
 ### Accessing the VKS cluster using the `kubectl vsphere` plugin
 You can connect to a VKS cluster using the vSphere Plugin for kubectl and authenticate with your vCenter Single Sign-On credentials.
@@ -27,7 +27,7 @@ kubectl vsphere login --server=<SUPERVISOR-CLUSTER-CONTROL-PLANE-IP> --vsphere-u
 Execute the below commands to generate the kubeconfig commands.   
 ```shell
 
-### Listing the secret in the vsphere workload namespace
+### Listing the secret in the vsphere namespace
 $ kubectl get secret -n <namespace> | grep -i kubeconfig
 indus-wl01-kubeconfig  cluster.x-k8s.io/secret    1  	22h
 
@@ -63,7 +63,7 @@ $ chmod 400 /tmp/<guest-cluster-name>-ssh-key
 $ kubectl get vm -o wide -n <namespace>
 ```
 
-Using the IP ADDRESS and the SSH private key, log in to the node.
+Log in to the node using the IP ADDRESS and the SSH private key.
 
 ```shell 
 #Connect as vmware-system-user to the desired node's IP address retrieved above using the ssh-key file
