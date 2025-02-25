@@ -212,9 +212,8 @@ The Contour and Harbor Supervisor Services image bundle binaries downloaded in S
 
 ```bash
 ## Sample Commands
-tanzu imgpkg copy --tar contour-v1.28.2.tar --to-repo registry0.env1.lab.test/sup-services/contour
-tanzu imgpkg copy --tar harbor-v2.9.1.tar   --to-repo registry0.env1.lab.test/sup-services/harbor
-
+tanzu imgpkg copy --tar contour-v1.28.2.tar --to-repo registry0.env1.lab.test/sup-services/contour --cosign-signatures
+tanzu imgpkg copy --tar harbor-v2.9.1.tar   --to-repo registry0.env1.lab.test/sup-services/harbor  --cosign-signatures
 ```
 
 Additionally, the corresponding Contour and Harbor Supervisor Service YAMsL needs to be updated with the new Bootstrap registry valid location -
