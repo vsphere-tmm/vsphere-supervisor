@@ -89,6 +89,8 @@ spec:
     - selector:
         apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
         kind: KubeadmControlPlaneTemplate
+        matchResources:
+          controlPlane: true
       jsonPatches:
         - op: add
           path: /spec/template/spec/kubeadmConfigSpec/files
@@ -114,6 +116,8 @@ spec:
     - selector:
         apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
         kind: KubeadmControlPlaneTemplate
+        matchResources:
+          controlPlane: true
       jsonPatches:
         - op: add
           path: /spec/template/spec/kubeadmConfigSpec/postKubeadmCommands/-
