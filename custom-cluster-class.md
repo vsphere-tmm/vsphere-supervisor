@@ -83,7 +83,7 @@ spec:
   ...
   patches:
   ...
-  ### Add a new or update an exiting patch
+  ### Add a new or update an existing patch
   - name: my-awesome-patch
     definitions:
     - selector:
@@ -91,7 +91,7 @@ spec:
         kind: KubeadmControlPlaneTemplate
       jsonPatches:
         - op: add
-          path: /spec/template/spec/files
+          path: /spec/template/spec/kubeadmConfigSpec/files
           valueFrom:
             template: |
               - content: |
@@ -108,7 +108,7 @@ spec:
   ...
   patches:
   ...
-  ### Add a new or update an exiting patch
+  ### Add a new or update an existing patch
   - name: my-awesome-patch
     definitions:
     - selector:
@@ -116,7 +116,7 @@ spec:
         kind: KubeadmControlPlaneTemplate
       jsonPatches:
         - op: add
-          path: /spec/template/spec/postKubeadmCommands/-
+          path: /spec/template/spec/kubeadmConfigSpec/postKubeadmCommands/-
           value: "sh /path/to/custom/script"
 ...
 ```
@@ -128,7 +128,7 @@ spec:
   ...
   patches:
   ...
-  ### Add a new or update an exiting patch
+  ### Add a new or update an existing patch
   - name: my-awesome-patch
     definitions:
     - selector:
@@ -157,7 +157,7 @@ spec:
   ...
   patches:
   ...
-  ### Add a new or update an exiting patch
+  ### Add a new or update an existing patch
   - name: my-awesome-patch
     definitions:
     - selector:
