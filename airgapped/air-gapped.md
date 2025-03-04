@@ -92,7 +92,7 @@ tar -czvf tanzu-cli-plugins.tar.gz -C ~/.local/share/tanzu-cli .
 Tanzu Packages enable administrators and users to use the Tanzu CLI or Carvel Custom Resources to add and manage standard services and add-ons on Kubernetes clusters. With Tanzu Packages, you can deploy various packages to VKS Clusters, such as cert-manager, Contour, Prometheus, Grafana, and more. Download the relevant bundle using the following command -
 
 ```bash
-tanzu imgpkg copy -b projects.registry.vmware.com/tkg/packages/standard/repo:v2024.8.21 --to-tar ./tanzu-packages.tar
+tanzu imgpkg copy -b projects.registry.vmware.com/tkg/packages/standard/repo:v2024.8.21 --to-tar ./tanzu-packages.tar --cosign-signatures
 ```
 
 ### 1d. Binaries and YAML files required for Supervisor Services
@@ -265,7 +265,7 @@ The Tanzu Package bundle, downloaded in Step 1c, must be uploaded to the Enterpr
 
 ```bash
 ## Sample Command
-tanzu imgpkg copy --tar tanzu-packages.tar --to-repo registry1.env1.lab.test/tanzu-packages/packages/standard/repo
+tanzu imgpkg copy --tar tanzu-packages.tar --to-repo registry1.env1.lab.test/tanzu-packages/packages/standard/repo --cosign-signatures --registry-response-header-timeout 600s
 ```
 
 ### 7b. Upload Supervisor Services to the Enterprise Registry
@@ -273,7 +273,7 @@ All the Supervisor Services image bundle binaries downloaded in Step 1d must be 
 
 ```bash
 ## Sample Command
-tanzu imgpkg copy --tar contour-v1.28.2.tar --to-repo registry1.env1.lab.test/sup-services/contour
+tanzu imgpkg copy --tar contour-v1.28.2.tar --to-repo registry1.env1.lab.test/sup-services/contour --cosign-signatures
 ```
 
 Additionally, the corresponding Supervisor Service YAML needs to be updated with the new Enterprise registry valid location -
