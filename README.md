@@ -10,5 +10,5 @@ Welcome to the GitHub repository for advanced vSphere Supervisor documentation! 
   * [VKS Troubleshooting Guide](/vks-troubleshooting.md)
   * [VM Service Troubleshooting Guide](/vm-service-troubleshooting)
   * others
-* [NSX Requirements for Supervisor](/nsx-requirements)
+* [NSX Requirements for Supervisor](/nsx-requirements.md)
 * [Custom Cluster Class](/custom-cluster-class.md)
