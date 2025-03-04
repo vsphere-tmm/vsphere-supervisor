@@ -1,4 +1,4 @@
-# Appendix: Air-Gapped deployment using Harbor Supervisor Service
+# Appendix: Air-Gapped Deployment Using Harbor Supervisor Service
 
 ## In this document, we will only capture the additional steps and/or differences that have not been addressed in the [primary air gap install document](/airgapped/air-gapped.md) 
 
@@ -179,6 +179,7 @@ Input the Registry host URL, TLS Certificate of the registry (the content of `re
 You can use the commands below to add the Bootstrap Harbor certificate to the Admin host trust store. 
 
 ```bash
+## Commands specific to Ubuntu
 sudo cp registry0.crt /usr/local/share/ca-certificates 
 sudo update-ca-certificates
 ```
@@ -208,7 +209,7 @@ Login Succeeded
 Create a project, `sup-services,` with public access within the Bootstrap registry to upload Contour and Harbor Supervisor Services that must be installed on the Supervisor.
 
 
-The Contour and Harbor Supervisor Services image bundle binaries downloaded in Step 1d must now be uploaded to the Bootstrap Harbor registry. Follow [steps 4 and 5 from the official documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/deploying-supervisor-services-from-a-private-container-image-registry/relocate-supervisor-services-to-a-private-registry.html) to complete this critical step. While the official documentation refers to the `imgpkg` binary to perform the download function, the Tanzu CLI's `imgpkg plugin` performs the identical function. 
+The Contour and Harbor Supervisor Services image bundle binaries downloaded in Step 1d must now be uploaded to the Bootstrap Harbor registry. Follow [steps 4 and 5 from the official documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/vsphere-supervisor-services-and-workloads-8-0/deploying-supervisor-services-from-a-private-container-image-registry/relocate-supervisor-services-to-a-private-registry.html) to complete this critical step. While the official documentation refers to the `imgpkg` binary to perform the download function, the Tanzu CLI's `imgpkg plugin` performs an identical function. 
 
 ```bash
 ## Sample Commands
@@ -255,7 +256,7 @@ For an air-gapped install, we have to disable the Trivy scanner from trying to u
 trivy:
   enabled: true
   skipUpdate: true
-  offline can: true
+  offline scan: true
 ```
 ---
 ## Complete Steps 6, 7, and 8 referenced in the primary air-gapped document.
