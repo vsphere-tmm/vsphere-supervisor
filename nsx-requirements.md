@@ -37,7 +37,7 @@ Note \-
 
 ### NSX Edge Transport Node 
 
-The NSX Edge Transport Nodes provide key routing services and connectivity to networks outside the NSX deployment. NSX Edge Transport Nodes provide a pool of capacity for running centralized services and are required if you want to deploy a Tier-0 or Tier-1 router with stateful services such as network address translation (NAT), VPN, and so on.
+The NSX Edge Transport Nodes provide key routing services and connectivity to networks outside the NSX deployment. They also provide a pool of capacity for running centralized services and are required if you want to deploy a Tier-0 or Tier-1 router with stateful services such as network address translation (NAT), VPN, and so on.
 
 The SDDC Manager provisions two NSX Edge Transport Nodes in an Edge Cluster. 
 
@@ -48,13 +48,13 @@ Pre-requisites for Edge-Cluster creation in VCF
 * Management network and management network gateway for the NSX Edge Transport Node must be reachable from the NSX host overlay and NSX Edge overlay VLANs  
 * The vSphere cluster hosting the NSX Edge nodes must include hosts with identical management, uplink, NSX Edge overlay TEP, and NSX Edge overlay TEP networks (L2 uniform).  
 * The vSphere clusters hosting the NSX Edge node VMs must have the same pNIC speed for NSX-enabled VDS uplinks chosen for Edge overlay (e.g., either 10G or 25G but not both)  
-* All nodes of an NSX Edge Transport Node Cluster must use the same set of NSX-enabled VDS uplinks. The selected uplinks must be prepared for overlay use.  
+* All NSX Edge Transport Node Cluster nodes must use the same set of NSX-enabled VDS uplinks. The selected uplinks must be prepared for overlay use.  
 * For Dynamic Routing via BGP \- Setup two BGP peers (on TORs or infra ESG) with an interface IP, ASN, and BGP password and reserve a BGP ASN for the NSX Edge cluster’s Tier-0 interfaces.  
 * For Routing via Static Routes \- Setup a Static Route via NSX Manager UI/API post creation of T0 Gateway 
 
 ![image](nsx-image2.png)
 
-Sample Edge Cluster JSON for creation of Large NSX Edge Cluster with EBGP Configuration
+Sample Edge Cluster JSON for the creation of a Large NSX Edge Cluster with EBGP Configuration
 
 ```json
 {
@@ -144,7 +144,7 @@ The VCF configuration process automatically sets up the BGP routing. The EBGP co
 
 #### Static Routing
 
-The configuration for static routes has to be added after creating a T0 Gateway in NSX Manager by UI/API to route traffic to external networks. No additional configuration is required on T1 Gateways as the T1 Gateway has a default static route to the connected T0 Gateway. 
+To route traffic to external networks, the configuration for static routes must be added after creating a T0 Gateway in NSX Manager by UI/API. No additional configuration is required on T1 Gateways, as the T1 Gateway has a default static route to the connected T0 Gateway. 
 The static route's next hop IP address must exist in a subnet associated with one of the edge gateway uplink interfaces; otherwise, the static route configuration will fail.
 
 NSX Static Routes Configuration Reference [Configure an NSX Static Route](https://techdocs.broadcom.com/us/en/vmware-cis/nsx/vmware-nsx/4-2/administration-guide/tier-0-gateways/configure-an-nsx-static-route.html).
@@ -155,8 +155,8 @@ This section explicitly outlines the process for VCF/VVF/Standalone vSphere Envi
 
 ### NSX Manager 
 
-- Install and Configure a 3 Node NSX Manager Cluster with a VIP as recommended for production environments. See [NSX Manager Install Guide](https://techdocs.broadcom.com/us/en/vmware-cis/nsx/vmware-nsx/4-2/installation-guide/nsx-transformers-installation-guide.html)
-- NSX Managers should be deployed as **Large** or **X-Large** to ensure they can support the Supervisor in a scaled deployment environment. 
+- Install and configure a 3 Node NSX Manager Cluster with a VIP as recommended for production environments. See [NSX Manager Install Guide](https://techdocs.broadcom.com/us/en/vmware-cis/nsx/vmware-nsx/4-2/installation-guide/nsx-transformers-installation-guide.html)
+- NSX Managers should be deployed as **Large** or **X-Large** to support the Supervisor in a scaled deployment environment. 
 - For production deployment, 3 NSX Managers should be deployed.
 
 | NSX Manager Size  | Supported Number of Hypervisors | Supported vSphere Clusters prepared for NSX |
@@ -191,22 +191,21 @@ $ vmkping -I vmk10 -S vxlan <destination_host's_TEP_VMK_IP> -d -s 1572
 
 ### NSX Edge Transport Node 
 
-* Create 2 Large Edge Transport Node directly from NSX UI/API/CLI 
+* Create 2 Large Edge Transport Nodes directly from NSX UI/API/CLI 
 
 Pre-requisites for NSX Edge Transport Creation
-* Separate VLANs and Network Subnets are available for the NSX host overlay VLAN and NSX Edge overlay VLAN. No DHCP for the NSX Edge overlay VLAN  
-* NSX host overlay VLAN and NSX Edge overlay VLAN need to be routed.  
+* Separate VLANs and Network Subnets are available for the NSX host overlay VLAN and NSX Edge overlay VLAN. No D$ vmkping -I vmk10 -S vxlan < destination_host's_TEP_VMK_IP> -d -s 1572 overlay VLAN need to be routed.  
 * DNS record creation for NSX Edges Nodes Management IP   
 * Management network and management network gateway for the NSX Edge nodes must be reachable from the NSX host overlay and NSX Edge overlay VLANs  
 * The vSphere clusters hosting the Edge clusters should be L2 Uniform. All host nodes in a hosting vSphere cluster need identical management, uplink, Edge, and host TEP networks.  
 * The vSphere clusters hosting the NSX Edge node VMs must have the same pNIC speed for NSX-enabled VDS uplinks chosen for Edge overlay (e.g., either 10G or 25G but not both)  
 * All nodes of an NSX Edge cluster must use the same set of NSX-enabled VDS uplinks. The selected uplinks must be prepared for overlay use.  
-* For Dynamic Routing via BGP \- Setup two BGP peers (on TORs or infra ESG) with an interface IP, ASN, and BGP password and reserve a BGP ASN for the NSX Edge cluster’s Tier-0 interfaces.  
+* For Dynamic Routing via BGP \- Setup two BGP peers (on TORs or infra ESG) with an interface IP, ASN, and BGP password and reserve a BGP ASN for the NSX Edge cluster's Tier-0 interfaces.  
 * For Routing via Static Routes \- Setup a Static Route via NSX Manager UI/API post creation of T0 Gateway 
 
-Post successful creation of two 2 Edge Transport, create an Edge Cluster and add the NSX Edge Transport Node to the Edge Cluster.
+After successfully creating two 2 Edge Transports, create an Edge Cluster and add the NSX Edge Transport Node to the Edge Cluster.
 
-- Documentation Reference \- [Create NSX Edge](https://techdocs.broadcom.com/us/en/vmware-cis/nsx/vmware-nsx/4-2/installation-guide/installing-nsx-edge.html) 
+- Documentation Reference \- [Create NSX Edge](https://techdocscluster's.com/us/en/vmware-cis/nsx/vmware-nsx/4-2/installation-guide/installing-nsx-edge.html) 
 - Documentation Reference \- [Create NSX Edge Cluster](https://techdocs.broadcom.com/us/en/vmware-cis/nsx/vmware-nsx/4-2/installation-guide/installing-nsx-edge/create-an-edge-cluster.html)
 
 ### NSX T0 Router
@@ -221,7 +220,7 @@ NSX IP Prefix Document Reference \- [NSX IP Prefix List](https://techdocs.broadc
 Route Map Document Reference \- [NSX Route Map](https://techdocs.broadcom.com/us/en/vmware-cis/nsx/vmware-nsx/4-2/administration-guide/tier-0-gateways/create-an-nsx-route-map.html)
 
 #### Static Routing
-The configuration for static routes has to be added after creating a T0 Gateway in NSX Manager by UI/API to route traffic to external networks. No additional configuration is required on T1 Gateways as the T1 Gateway has a default static route to the connected T0 Gateway. The static route's next hop IP address must exist in a subnet associated with one of the edge gateway uplink interfaces; otherwise, the static route configuration will fail.
+The configuration for static routes must be added after creating a T0 Gateway in NSX Manager by UI/API to route traffic to external networks. No additional configuration is required on T1 Gateways, as the T1 Gateway has a default static route to the connected T0 Gateway. The static route's next hop IP address must exist in a subnet associated with one of the edge gateway uplink interfaces; otherwise, the static route configuration will fail.
 
 NSX Static Routes Configuration Documentation Reference [Configure an NSX Static Route](https://techdocs.broadcom.com/us/en/vmware-cis/nsx/vmware-nsx/4-2/administration-guide/tier-0-gateways/configure-an-nsx-static-route.html).
 
@@ -233,11 +232,11 @@ This section outlines the network requirements for the Supervisor network, a com
 
 **Ingress Network** \- Routed IP Segment with a non-overlapping CIDR range to be used for IP addresses of ingress. Ingress IP CIDR Block allocates IP addresses for published services with service type LoadBalancer or Ingress controller resource that handles external traffic to services. The minimum requirement is a CIDR of /27.
 
-**Egress Network** \- Routed IP Segment with a non-overlapping CIDR range to determine the egress IP for Kubernetes services and namespaces . The egress IP is used to initiate outbound traffic to outbound services. The minimum requirement is a CIDR of /27.
+**Egress Network** \- Routed IP Segment with a non-overlapping CIDR range to determine the egress IP for Kubernetes services and namespaces. The egress IP is used to initiate outbound traffic to outbound services. The minimum requirement is a CIDR of /27.
 
 **IMPORTANT** \- 
 
-For a **Static Route** configuration, add a static route on TOR with NSX T0 Uplink Interface as the next hop for both Ingress Network and Egress Network. 
+For a **Static Route** configuration, add a static route on TOR with the NSX T0 Uplink Interface as the next hop for both the Ingress and Egress Networks. 
 
 ```
 # sample router statement could be similar to this
@@ -249,7 +248,7 @@ For a **BGP-based** configuration, the dynamic routing protocol automatically ad
 
 **Other Network Requirements**
 
-**Management Network**—This subnet manages traffic between ESXi hosts, vCenter Server, NSX Appliances, and the Kubernetes control plane. It should have a minimum of five IP addresses for the Kubernetes control plane ( Supervisor Nodes): one for each of the three nodes, one for virtual IP, and one for rolling cluster upgrade. The Management network segment can be on the Overlay or vDS-backed and should be routed. 
+**Management Network**—This subnet manages traffic between ESXi hosts, vCenter Server, NSX Appliances, and the Kubernetes control plane. It should have a minimum of five IP addresses for the Kubernetes control plane ( Supervisor Nodes): one for each of the three nodes, one for the virtual IP, and one for the rolling cluster upgrade. The Management network segment can be on the Overlay or vDS-backed and should be routed. 
 
 **Kubernetes Service CIDR**—A non-routed Private/Internal CIDR block from which IPs for Kubernetes ClusterIP Services will be allocated. It cannot overlap with IPs of Workload Management components (VC, NSX, ESXs, Management DNS, NTP) and should not overlap with other data center IPs communicating with pods. This can be changed or left at default at the deployment time; however, each Supervisor cluster must have a unique service CIDR.
 
