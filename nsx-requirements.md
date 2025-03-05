@@ -6,7 +6,7 @@ This document provides a comprehensive checklist and requirements for deploying 
 * Make sure that all hostnames of all ESXi nodes servers are in lowercase.
 * The minimum MTU required for the entire network path (VMkernel ports, virtual switches, physical switches, and routers) is 1600; however, the recommended value is 1700.  [Maximum Transmission Unit](https://techdocs.broadcom.com/us/en/vmware-cis/nsx/vmware-nsx/4-2/installation-guide/transport-zones-and-transport-nodes/mtu-guidance.html)
 
---- add flowchart
+![image](nsx-image1.png)
 
 ## NSX Configuration for VCF Environment 
 This section outlines the VCF Environment process where SDDC Manager workflows do the NSX Configuration. 
@@ -52,7 +52,7 @@ Pre-requisites for Edge-Cluster creation in VCF
 * For Dynamic Routing via BGP \- Setup two BGP peers (on TORs or infra ESG) with an interface IP, ASN, and BGP password and reserve a BGP ASN for the NSX Edge cluster’s Tier-0 interfaces.  
 * For Routing via Static Routes \- Setup a Static Route via NSX Manager UI/API post creation of T0 Gateway 
 
---- Add image
+![image](nsx-image2.png)
 
 Sample Edge Cluster JSON for creation of Large NSX Edge Cluster with EBGP Configuration
 
