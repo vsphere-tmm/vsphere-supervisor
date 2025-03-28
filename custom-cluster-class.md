@@ -87,7 +87,7 @@ spec:
   - name: my-awesome-patch
     definitions:
     - selector:
-        apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+        apiVersion: controlplane.cluster.x-k8s.io/v1beta1
         kind: KubeadmControlPlaneTemplate
         matchResources:
           controlPlane: true
@@ -114,7 +114,7 @@ spec:
   - name: my-awesome-patch
     definitions:
     - selector:
-        apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+        apiVersion: controlplane.cluster.x-k8s.io/v1beta1
         kind: KubeadmControlPlaneTemplate
         matchResources:
           controlPlane: true
@@ -176,4 +176,49 @@ spec:
           path: /spec/template/spec/postKubeadmCommands/-
           value: "sh /path/to/custom/script"
 ...
+```
+
+## Kubernetes Component Customization
+### Introducing a new admission plugin in API server
+
+```yaml
+spec:
+  ...
+  patches:
+  ...
+  - name: enableNewAdmissionPluginBasedOnK8sVersion
+      enabledIf: '{{ semverCompare ">=1.32.0-0" .builtin.controlPlane.version }}'
+      definitions:
+      - selector:
+          apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+          kind: KubeadmControlPlaneTemplate
+          matchResources:
+            controlPlane: true
+        jsonPatches:
+          - op: replace
+            path: /spec/template/spec/kubeadmConfigSpec/clusterConfiguration/apiServer/extraArgs/enable-admission-plugins
+            value: "PodSecurity,NodeRestriction,NamespaceLifecycle,ServiceAccount,MutatingAdmissionPolicy"
+```
+
+**Note:** Until VKS 3.3.x versions, admissions plugins are overridden when generating the control plane configuration. When adding a new plugin, please ensure that all existing plugins are appended to the list. In this example, adding a new entry `MutatingAdmissionPolicy` also required adding all existing admission plugins.
+
+### Introducing a new feature gate
+
+```yaml
+spec:
+  ...
+  patches:
+  ...
+  - name: enableNewAdmissionPluginBasedOnK8sVersion
+      enabledIf: '{{ semverCompare ">=1.32.0-0" .builtin.controlPlane.version }}'
+      definitions:
+      - selector:
+          apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+          kind: KubeadmControlPlaneTemplate
+          matchResources:
+            controlPlane: true
+        jsonPatches:
+          - op: replace
+            path: /spec/template/spec/kubeadmConfigSpec/clusterConfiguration/apiServer/extraArgs/feature-gates
+            value: "kube:PodLifecycleSleepActionAllowZero=true"
 ```
