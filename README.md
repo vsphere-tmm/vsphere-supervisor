@@ -5,7 +5,7 @@ Welcome to the GitHub repository for advanced vSphere Supervisor documentation! 
 
 ## Advanced Documentation
 * [VKS Deployment Guide for Air-Gapped Environments](/airgapped/air-gapped.md)
-* [Superisor and VKS Ports and Protocol](/port-and-protocols.md)
+* [Supervisor and VKS Ports and Protocol](/port-and-protocols.md)
 * Supervisor Troubleshooting Resources
   * [Supervisor Troubleshooting Guide](/supervisor-troubleshooting.md)
   * [VKS Troubleshooting Guide](/vks-troubleshooting.md)
