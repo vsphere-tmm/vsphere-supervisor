@@ -83,9 +83,8 @@ tanzu plugin group search -n vmware-vsphere/default --show-details
 ## Install Tanzu vSphere Plugins for the Bastion host
 tanzu plugin install --group vmware-vsphere/default:v8.0.3
 
-## The required plugins get installed in `~/.local/share/tanzu-cli/`
-## Tar the files in this folder. Note the '.' at the end of the command.
-tar -czvf tanzu-cli-plugins.tar.gz -C ~/.local/share/tanzu-cli .
+## Pull the plugin group into a tarball using the following command
+tanzu plugin download-bundle --group vmware-vsphere/default --to-tar tanzu-cli-plugins.tar.gz
 ```
 
 ### 1c. Tanzu Packages
@@ -150,7 +149,7 @@ The following files, binaries, and packages have been successfully downloaded in
 Using the steps and directions in the official [documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/installing-and-configuring-vsphere-supervisor.html), configure the required networking, storage policies, and profiles and enable the Supervisor on `vcenter.env1.lab.test`.
 
 ## 3. Create a Kubernetes release content library and upload Kubernetes release images
-The Kubernetes release OVAs downloaded on the Bastion host and copied to the Admin host must be uploaded to a Content library within the vCenter. Before proceeding, a local content library must be created. The "Create a Local Content Library (for Air-Gapped Cluster Provisioning)" [docuentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/using-tkg-service-with-vsphere-supervisor/administering-kubernetes-releases-for-tkg-service-clusters/create-a-local-content-library-for-air-gapped-cluster-provisioning.html) provides instructions on creating and importing Kubernetes Release (Kr) images into the content library. **Step #12** provides details on files (downloaded previously in step 1a) that need to be uploaded to the local content library. 
+The Kubernetes release OVAs downloaded on the Bastion host and copied to the Admin host must be uploaded to a Content library within the vCenter. Before proceeding, a local content library must be created. The "Create a Local Content Library (for Air-Gapped Cluster Provisioning)" [documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/using-tkg-service-with-vsphere-supervisor/administering-kubernetes-releases-for-tkg-service-clusters/create-a-local-content-library-for-air-gapped-cluster-provisioning.html) provides instructions on creating and importing Kubernetes Release (Kr) images into the content library. **Step #12** provides details on files (downloaded previously in step 1a) that need to be uploaded to the local content library. 
 
 ## 4. Create vSphere Namespace(s) for VKS Clusters(s)
 If not already created, a vSphere namespace should be created. Refer to "[Configure a vSphere Namespace for Hosting TKG Service Clusters](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/using-tkg-service-with-vsphere-supervisor/configuring-vsphere-namespaces-for-hosting-tkg-service-clusters.html)" to configure the vSphere Namespace.
@@ -185,29 +184,7 @@ kubectl version
 kubectl vsphere version
 ```
 
-### 5b. Install the Tanzu CLI
-
-```bash
-cd /<path-to-files-copied-from-bastion>/
-
-tar -xzvf ./tanzu-cli-linux-amd64.tar.gz
-
-## Move to Tanzu CLI to Executable Path
-sudo install ./v1.1.0/tanzu-cli-linux_amd64 /usr/local/bin/tanzu
-
-## Verify the installation using the below command
-tanzu version
-
-## Extract the Tanzu CLI Plugins in the ~/.local/share/tanzu-cli/ folder
-mkdir -p ~/.local/share/tanzu-cli/
-tar -xzvf ./tanzu-cli-plugins.tar.gz -C  ~/.local/share/tanzu-cli/
-
-## Validate the existace of plugin files in the folder
-ls -al ~/.local/share/tanzu-cli/
-tanzu plugin list
-```
-
-### 5c. Login to Supervisor
+### 5b. Login to Supervisor
 If not logged in, log in to the Supervisor using the `kubectl-vsphere` plugin. 
 
 ```bash
@@ -218,7 +195,7 @@ kubectl vsphere login --vsphere-username <sso_username> --server=https://<Superv
 kubectl vsphere login --vsphere-username administrator@vsphere.local --server=https://supervisor0.env1.lab.test --insecure-skip-tls-verify
 ```
 
-### 5d. Add the Enterprise Registry certificate to the Admin host Trust Store (Optional)
+### 5c. Add the Enterprise Registry certificate to the Admin host Trust Store (Optional)
 To ensure the Admin machine trusts the registry, we must add the Enterprise registry certificate (E.g., the contents saved in file `registry1.crt`) to the Trust Store. This step is optional and required only when using a certificate not signed by a trusted Certificate authority (e.g., a self-signed certificate).
 
 ```bash
@@ -246,6 +223,33 @@ https://docs.docker.com/engine/reference/commandline/login/#credential-stores
 Login Succeeded
 =====
 ```
+### 5d. Install the Tanzu CLI
+
+```bash
+cd /<path-to-files-copied-from-bastion>/
+
+tar -xzvf ./tanzu-cli-linux-amd64.tar.gz
+
+## Move to Tanzu CLI to Executable Path
+sudo install ./v1.1.0/tanzu-cli-linux_amd64 /usr/local/bin/tanzu
+
+## Verify the installation using the below command
+tanzu version
+
+## Upload plugins to enterprise repository
+tanzu plugin upload-bundle –tar tanzu-cli-plugins.tar.gz –to-repo registry1.env1.lab.test/tanzu-cli/plugins # Note the path.
+ 
+## Update repository location
+tanzu plugin source update default --uri registry1.env1.lab.test/tanzu_cli/plugins/plugin-inventory:latest
+ 
+## Install the Plugins
+tanzu plugin install –group vmware-vsphere/default:v8.0.3
+ 
+## Validate the existace of plugin files in the folder
+ls -al ~/.local/share/tanzu-cli/
+tanzu plugin list
+```
+
 ## 6. Add the Enterprise Registry certificate to the Supervisor (Optional)
 The Supervisor must trust the Enterprise registry certificate. This step is optional and required only when using a certificate not signed by a trusted Certificate authority (e.g., a self-signed certificate). To perform this step, navigate to Workload Management -> Supervisor -> Configure -> Container Registries. Click on Add Registry. 
 
@@ -296,7 +300,7 @@ Perform these steps for all the Supervisor Services that were previously downloa
 When writing the documentation, the latest TKG Service was v3.2. Since each TKG Service introduces additional features and fixes, we must apply these updates to make the new features and fixes available. This document will update the core TKG Service from 3.1.1 to 3.2. Follow the relevant sections in the [documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/using-tkg-service-with-vsphere-supervisor/installing-and-upgrading-the-tkg-service.html) to complete the upgrade. 
 
 ### 8b. Create a Workload Cluster certificate (Optional)
-The VKS cluster nodes and `Kapp` controllers running on the VKS cluster must trust the Enterprise registry's SSL certificate. This step is optional and not required if a trusted certificate authority signs the Enterprise registry’s certificate. The following [product documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/using-tkg-service-with-vsphere-supervisor/provisioning-tkg-service-clusters/using-the-cluster-v1beta1-api/v1beta1-example-cluster-with-additional-trusted-ca-certificates-for-ssl-tls.html) link provides details on how to perform this step. 
+The VKS cluster nodes and `kapp` controllers running on the VKS cluster must trust the Enterprise registry's SSL certificate. This step is optional and not required if a trusted certificate authority signs the Enterprise registry’s certificate. The following [product documentation](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/using-tkg-service-with-vsphere-supervisor/provisioning-tkg-service-clusters/using-the-cluster-v1beta1-api/v1beta1-example-cluster-with-additional-trusted-ca-certificates-for-ssl-tls.html) link provides details on how to perform this step. 
 
 ```bash
 ## Sample command
