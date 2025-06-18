@@ -4,9 +4,9 @@ You can use the example below as a guideline to build your VKS cluster manifest.
 * The clusterclass variables spec that defines a list of key-value pairs that can be used to add additional configuration to the cluster. This section depends on the version of clusterclass that has been defined in the `spec.topology.class` section. Depending on the version being used, you can refer to the example provided in the relevant section.
 
 Where possible, we have provided an exhaustive list of available variables. We have provided some default variables and commented out optional sections. To build a cluster manifest for your environment - 
-* Copy the first yaml in this document,
+* Copy the first yaml in this document (section 1),
 * Modify the values as per your environment, 
-* Depending on the cluster class version that will be used, copy the relevant clusterclass section and append it to the end of the first yaml
+* Depending on the cluster class version that will be used, copy the relevant clusterclass from section 2 and append it to the end of the first yaml.
 
 Please refer to the official documentation for additional details. This has been tested with hvSphere 8.0U3+/VKS 3.4
 
@@ -28,7 +28,8 @@ spec:
       cidrBlocks: ["240.1.0.0/20"]
 #  paused: false
   topology:
-    class: CLUSTER-CLASS                     # kubectl get clusterclass -n VSPHERE-NAMESPACE. See below for more info. 
+    class: CLUSTER-CLASS                        # kubectl get clusterclass -n VSPHERE-NAMESPACE. See below for more info. 
+#    classNamespace: vmware-system-vks-public 
     controlPlane:
 #      machineHealthCheck:
 #        enable: true
@@ -53,7 +54,7 @@ spec:
 #      nodeVolumeDetachTimeout: 0
       replicas: 3                               # allowed values 1,3
 #      variables:
-#        overrides:                             # See Clusterclass variables for more details     
+#        overrides:                             # See Clusterclass variables for more details
 #        - name: vmClass
 #          value: best-effort-large
     version: VKR-VERSION                        # kubectl get kr
@@ -72,8 +73,8 @@ spec:
 #          unhealthyRange: "[3-5]"
 #        metadata:
 #          annotations:
-#            cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: "3"
-#            cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: "0"
+#            cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: "3"         # Use this for ClusterAutoscaler. 
+#            cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: "0"         # Use this for ClusterAutoscaler. 
 #            run.tanzu.vmware.com/resolve-os-image: os-name=ubuntu 
 #            or
 #            run.tanzu.vmware.com/resolve-os-image: "os-name=ubuntu,os-version=24.04" # If using Kubernetes 1.33
@@ -102,101 +103,18 @@ spec:
 
 ## Section 2
 
-`class: tanzukubernetescluster` or `class: builtin-generic-v3.1.0`
+### `class: builtin-generic-v3.4.0`
 
 ```yaml
-      - name: clusterEncryptionConfigYaml
-        value: |
-          apiVersion: apiserver.config.k8s.io/v1
-          kind: EncryptionConfiguration
-          resources:
-            - resources:
-                - secrets
-              providers:
-                - aescbc:
-                    keys:
-                      - name: key1
-                        secret: QiMgJGYXudtljldVyl+AnXQQlk7r9iUXBfVKqdEfKm8=
-                - identity: {}
-      - name: controlPlaneCertificateRotation
-        value:
-          daysBefore: 90 
-      - name: controlPlaneVolumes
-        value:
-        - capacity:
-            storage: "15Gi"
-          mountPath: "/var/lib/containerd"
-          name: containerd
-          storageClass: vsan-default-storage-policy
-        - capacity:
-            storage: "15Gi"
-          mountPath: "/var/lib/kubelet"
-          name: kubelet
-          storageClass: vsan-default-storage-policy
-      - name: defaultRegistrySecret
-        value: 
-      - name: defaultStorageClass
-        value: vsan-default-storage-policy
-      - name: defaultVolumeSnapshotClass
-        value: vol-snapclass-foo
-      - name: extensionCert
-        value: 
-      - name: kubeAPIServerFQDNs
-        value: [demo.fqdn.com, test.fqdn.com]
-      - name: nodePoolLabels
-        value:
-          - key: tenant 
-            value: tenant-foo
-          - key: organization
-            value: engineering
-          - key: managed
-            value: ""
-      - name: nodePoolTaints
-        value: 
-      - name: nodePoolVolumes
-        value:
-        - capacity:
-            storage: "15Gi"
-          mountPath: "/var/lib/containerd"
-          name: containerd
-          storageClass: vsan-default-storage-policy
-        - capacity:
-            storage: "15Gi"
-          mountPath: "/var/lib/kubelet"
-          name: kubelet
-          storageClass: vsan-default-storage-policy
-      - name: ntp
-        value: ntp.vmware.com
-      - name: podSecurityStandard
-        value:
-          audit: restricted
-          auditVersion: latest
-          enforce: privileged
-          enforceVersion: latest
-          warn: privileged
-          warnVersion: latest 
-      - name: proxy
-        value:
-          httpProxy: http://1.2.3.4:2139
-          httpsProxy: http://1.2.3.4:2139
-          noProxy: ["no.proxy.test1" , "no.proxy.test2"] 
-      - name: storageClass
-        value: vsan-default-storage-policy
-      - name: storageClasses
-        value: [vsan-default-storage-policy, vsan-default-storage-policy-1]
-      - name: trust
-        value:
-          additionalTrustedCAs:
-          - name: harbor-ca-1
-      - name: user
-        value: 
-      - name: vmClass
-        value: best-effort-small
-      - name: volumeSnapshotClasses
-        value: [vol-snapclass-foo, vol-snapclass-bar]
+to add
 ```
 
-`builtin-generic-v3.2.0`
+### `class: builtin-generic-v3.3.0`
+```yaml
+to add
+```
+
+### `class: builtin-generic-v3.2.0`
 
 ```yaml
       - name: kubernetes
@@ -283,8 +201,94 @@ spec:
             defaultVolumeSnapshotClass: vol-snapclass-bar
 ```
 
-`builtin-generic-v3.3.0`
+### `class: tanzukubernetescluster` or `class: builtin-generic-v3.1.0`
 
 ```yaml
-to add
+      - name: clusterEncryptionConfigYaml
+        value: |
+          apiVersion: apiserver.config.k8s.io/v1
+          kind: EncryptionConfiguration
+          resources:
+            - resources:
+                - secrets
+              providers:
+                - aescbc:
+                    keys:
+                      - name: key1
+                        secret: QiMgJGYXudtljldVyl+AnXQQlk7r9iUXBfVKqdEfKm8=
+                - identity: {}
+      - name: controlPlaneCertificateRotation
+        value:
+          daysBefore: 90 
+      - name: controlPlaneVolumes
+        value:
+        - capacity:
+            storage: "15Gi"
+          mountPath: "/var/lib/containerd"
+          name: containerd
+          storageClass: vsan-default-storage-policy
+        - capacity:
+            storage: "15Gi"
+          mountPath: "/var/lib/kubelet"
+          name: kubelet
+          storageClass: vsan-default-storage-policy
+      - name: defaultRegistrySecret
+        value: 
+      - name: defaultStorageClass
+        value: vsan-default-storage-policy
+      - name: defaultVolumeSnapshotClass
+        value: vol-snapclass-foo
+      - name: kubeAPIServerFQDNs
+        value: [demo.fqdn.com, test.fqdn.com]
+      - name: nodePoolLabels
+        value:
+          - key: tenant 
+            value: tenant-foo
+          - key: organization
+            value: engineering
+          - key: managed
+            value: ""
+      - name: nodePoolTaints
+        value: 
+      - name: nodePoolVolumes
+        value:
+        - capacity:
+            storage: "15Gi"
+          mountPath: "/var/lib/containerd"
+          name: containerd
+          storageClass: vsan-default-storage-policy
+        - capacity:
+            storage: "15Gi"
+          mountPath: "/var/lib/kubelet"
+          name: kubelet
+          storageClass: vsan-default-storage-policy
+      - name: ntp
+        value: ntp.vmware.com
+      - name: podSecurityStandard
+        value:
+          audit: restricted
+          auditVersion: latest
+          enforce: privileged
+          enforceVersion: latest
+          warn: privileged
+          warnVersion: latest 
+      - name: proxy
+        value:
+          httpProxy: http://1.2.3.4:2139
+          httpsProxy: http://1.2.3.4:2139
+          noProxy: ["no.proxy.test1", "no.proxy.test2"] 
+      - name: storageClass
+        value: vsan-default-storage-policy
+      - name: storageClasses
+        value: [vsan-default-storage-policy, vsan-default-storage-policy-1]
+      - name: trust
+        value:
+          additionalTrustedCAs:
+          - name: harbor-ca-1
+      - name: user
+        value: 
+      - name: vmClass
+        value: best-effort-small
+      - name: volumeSnapshotClasses
+        value: [vol-snapclass-foo, vol-snapclass-bar]
 ```
