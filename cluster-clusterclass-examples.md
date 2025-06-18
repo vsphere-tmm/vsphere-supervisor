@@ -1,4 +1,14 @@
 
+You can use the example below as a guideline to build your VKS cluster manifest. The cluster spec could be broken down into two parts - 
+* The general spec and the topology describing the control plane and worker node pools.
+* The clusterclass variables spec that defines a list of key-value pairs that can be used to add additional configuration to the cluster. This section depends on the version of clusterclass that has been defined in the `spec.topology.class` section. Depending on the version being used, you can refer to the example provided in the relevant section.
+
+Where possible, we have provided an exhaustive list of available variables. We have provided some default variables and commented out optional sections. To build a cluster manifest for your environment - 
+* Copy the first yaml in this document,
+* Modify the values as per your environment, 
+* Depending on the cluster class version that will be used, copy the relevant clusterclass section and append it to the end of the first yaml
+
+Please refer to the official documentation for additional details. 
 
 ## vSphere 8.0U3+/VKS 3.4
 
@@ -46,7 +56,7 @@ spec:
 #        overrides:                             # See Clusterclass variables for more details     
 #        - name: vmClass
 #          value: best-effort-large
-    version: v1.32.0+vmware.6-fips              # kubectl get vkr
+    version: VKR-VERSION                        # kubectl get kr
     workers:
       machineDeployments:
       - class: node-pool
@@ -272,3 +282,7 @@ spec:
 ```
 
 `builtin-generic-v3.3.0`
+
+```yaml
+to add
+```
