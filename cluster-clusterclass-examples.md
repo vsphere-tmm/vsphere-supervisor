@@ -8,9 +8,9 @@ Where possible, we have provided an exhaustive list of available variables. We h
 * Modify the values as per your environment, 
 * Depending on the cluster class version that will be used, copy the relevant clusterclass section and append it to the end of the first yaml
 
-Please refer to the official documentation for additional details. 
+Please refer to the official documentation for additional details. This has been tested with hvSphere 8.0U3+/VKS 3.4
 
-## vSphere 8.0U3+/VKS 3.4
+## Section 1 
 
 ```yaml
 apiVersion: cluster.x-k8s.io/v1beta1
@@ -99,6 +99,8 @@ spec:
 #            value: best-effort-large
     variables:
 ```
+
+## Section 2
 
 `class: tanzukubernetescluster` or `class: builtin-generic-v3.1.0`
 
