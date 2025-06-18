@@ -97,7 +97,7 @@ spec:
 #          overrides:
 #          - name: vmClass
 #            value: best-effort-large
-    variables:
+    variables:                                  # Append the relevant Clusterclass from Section 2
 ```
 
 ## Section 2
