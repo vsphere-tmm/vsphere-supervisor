@@ -106,7 +106,7 @@ spec:
 ### `class: builtin-generic-v3.4.0`
 
 ```yaml
-      - name: kubernetes                                    # OPTIONAL, cluster-wide config
+      - name: kubernetes                                     # OPTIONAL, cluster-wide config
         value: 
           certificateRotation:                               # OPTIONAL
             enabled: true                                    # OPTIONAL, default: true
@@ -125,7 +125,7 @@ spec:
                 namespaces: []                               # OPTIONAL, string, namespace to exempt
       - name: node                                           # OPTIONAL, per-node config
         value: 
-          labels:                                            # OPTIONAL, key:value map
+          labels:                                            # OPTIONAL, key: value map
             tenant: tenant-foo
             organization: engineering
             managed: ""
@@ -149,7 +149,7 @@ spec:
           systemProxy:                                       # OPTIONAL
             http: "http://1.2.3.4:2139"                      # REQUIRED if systemProxy is set, string
             https: "http://1.2.3.4:2139"                     # REQUIRED if systemProxy is set, string
-            noProxy: ["no.proxy.test1" , "no.proxy.test2"]   # REQUIRED if systemProxy is set, string
+            noProxy: ["no.proxy.test1", "no.proxy.test2"]    # REQUIRED if systemProxy is set, string
           trust:                                             # OPTIONAL
             additionalTrustedCAs:                            # REQUIRED if trust is set
               - caCert:
@@ -175,8 +175,8 @@ spec:
             password:
               renewalDaysBeforeExpiry: 7                     # OPTIONAL, default 7
             passwordSecret:
-              name: "user-secret-key"                        # REQUIRED if passwordSecret used
-              key: "user-secret-name"                        # REQUIRED if passwordSecret used
+              name: "user-secret-name"                       # REQUIRED if passwordSecret used
+              key: "user-secret-key"                         # REQUIRED if passwordSecret used
       - name: resourceConfiguration                          # OPTIONAL
         value: 
           systemReserved:                                    # OPTIONAL
@@ -229,7 +229,7 @@ spec:
                 namespaces: []                               # OPTIONAL, string, namespace to exempt
       - name: node                                           # OPTIONAL
         value: 
-          labels:                                            # OPTIONAL, key:value map
+          labels:                                            # OPTIONAL, key: value map
             tenant: tenant-foo
             organization: engineering
             managed: ""
@@ -253,7 +253,7 @@ spec:
           systemProxy:                                       # OPTIONAL
             http: "http://1.2.3.4:2139"                      # REQUIRED if systemProxy is set, string
             https: "http://1.2.3.4:2139"                     # REQUIRED if systemProxy is set, string
-            noProxy: ["no.proxy.test1" , "no.proxy.test2"]   # REQUIRED if systemProxy is set, string
+            noProxy: ["no.proxy.test1", "no.proxy.test2"]    # REQUIRED if systemProxy is set, string
           trust:                                             # OPTIONAL
             additionalTrustedCAs:                            # REQUIRED if trust is set
               - caCert:
@@ -274,11 +274,11 @@ spec:
               - key: ""                                      # REQUIRED for each setting
                 value: ""                                    # REQUIRED for each setting
           user:                                              # OPTIONAL
-            user: "vmware-system-user"                               # REQUIRED, string, e.g., "vmware-system-user"
+            user: "vmware-system-user"                       # REQUIRED, string, e.g., "vmware-system-user"
             sshAuthorizedKey: "sshAuthorizedKeyTest..."      # OPTIONAL, must have at least sshAuthorizedKey or passwordSecret if user is set
             passwordSecret:
-              name: "user-secret-key"                        # REQUIRED if passwordSecret used
-              key: "user-secret-name"                        # REQUIRED if passwordSecret used
+              name: "user-secret-name"                       # REQUIRED if passwordSecret used
+              key: "user-secret-key"                         # REQUIRED if passwordSecret used
       - name: resourceConfiguration                          # OPTIONAL
         value: 
           systemReserved:                                    # OPTIONAL
@@ -319,18 +319,18 @@ spec:
           endpointFQDNs: ["demo.fqdn.com", "test.fqdn.com"]  # OPTIONAL, string, FQDN alias for control plane
           security:                                          # OPTIONAL
             podSecurityStandard:                             # OPTIONAL
-              audit: privilaged                              # OPTIONAL, enum: "", privileged, baseline, restricted
+              audit: privileged                              # OPTIONAL, enum: "", privileged, baseline, restricted
               auditVersion: latest                           # OPTIONAL, string, e.g., "v1.31"
-              enforce: privilaged                            # OPTIONAL, enum: "", privileged, baseline, restricted
+              enforce: privileged                            # OPTIONAL, enum: "", privileged, baseline, restricted
               enforceVersion: latest                         # OPTIONAL, string
-              warn: privilaged                               # OPTIONAL, enum: "", privileged, baseline, restricted
+              warn: privileged                               # OPTIONAL, enum: "", privileged, baseline, restricted
               warnVersion: latest                            # OPTIONAL, string
               deactivated: false                             # OPTIONAL, boolean, default: false
               exemptions:                                    # OPTIONAL
                 namespaces: []                               # OPTIONAL, string, namespace to exempt
       - name: node                                           # OPTIONAL
         value: 
-          labels:                                            # OPTIONAL, map of key:value
+          labels:                                            # OPTIONAL, map of key: value
             tenant: tenant-foo
             organization: engineering
             managed: ""
@@ -345,7 +345,7 @@ spec:
           systemProxy:                                       # OPTIONAL
             http: "http://1.2.3.4:2139"                      # REQUIRED if systemProxy is set, string
             https: "http://1.2.3.4:2139"                     # REQUIRED if systemProxy is set, string
-            noProxy: ["no.proxy.test1" , "no.proxy.test2"]   # REQUIRED if systemProxy is set, string
+            noProxy: ["no.proxy.test1", "no.proxy.test2"]    # REQUIRED if systemProxy is set, string
           trust:                                             # OPTIONAL
             additionalTrustedCAs:                            # REQUIRED if trust is set
               - caCert:
@@ -363,8 +363,8 @@ spec:
             user: "vmware-system-user"                       # REQUIRED, string, e.g., "vmware-system-user"
             sshAuthorizedKey: "sshAuthorizedKeyTest..."      # OPTIONAL, must have at least sshAuthorizedKey or passwordSecret if user is set
             passwordSecret:
-              name: "user-secret-key"                        # REQUIRED if passwordSecret used
-              key: "user-secret-name"                        # REQUIRED if passwordSecret used
+              name: "user-secret-name"                       # REQUIRED if passwordSecret used
+              key: "user-secret-key"                         # REQUIRED if passwordSecret used
       - name: resourceConfiguration                          # OPTIONAL
         value: 
           systemReserved:                                    # OPTIONAL
@@ -397,8 +397,8 @@ spec:
 ### `class: tanzukubernetescluster` or `class: builtin-generic-v3.1.0`
 
 ```yaml
-      - name: clusterEncryptionConfigYaml
-        value: |
+      - name: clusterEncryptionConfigYaml                    # OPTIONAL
+        value: |                                             # REQUIRED, Inline YAML string
           apiVersion: apiserver.config.k8s.io/v1
           kind: EncryptionConfiguration
           resources:
@@ -410,78 +410,93 @@ spec:
                       - name: key1
                         secret: QiMgJGYXudtljldVyl+AnXQQlk7r9iUXBfVKqdEfKm8=
                 - identity: {}
-      - name: controlPlaneCertificateRotation
+      - name: controlPlaneCertificateRotation                # OPTIONAL
         value:
-          daysBefore: 90 
-      - name: controlPlaneVolumes
+          activate: true                                     # OPTIONAL, boolean, default: true
+          daysBefore: 90                                     # OPTIONAL, integer, default: 90, minimum: 7
+      - name: controlPlaneVolumes                            # OPTIONAL
         value:
-        - capacity:
-            storage: "15Gi"
-          mountPath: "/var/lib/containerd"
-          name: containerd
-          storageClass: vsan-default-storage-policy
-        - capacity:
-            storage: "15Gi"
-          mountPath: "/var/lib/kubelet"
-          name: kubelet
-          storageClass: vsan-default-storage-policy
-      - name: defaultRegistrySecret
+        - name: "containerd"                                 # OPTIONAL, string
+          mountPath: "/var/lib/containerd"                   # OPTIONAL, string
+          storageClass: "vsan-default-storage-policy"        # OPTIONAL, string
+          capacity:
+            storage: "15Gi"                                  # OPTIONAL, string
+        - name: "kubelet"                                    # OPTIONAL, string
+          mountPath: "/var/lib/kubelet"                      # OPTIONAL, string
+          storageClass: "vsan-default-storage-policy"        # OPTIONAL, string
+          capacity:
+            storage: "15Gi"                                  # OPTIONAL, string
+      - name: defaultRegistrySecret                          # OPTIONAL
         value: 
-      - name: defaultStorageClass
-        value: vsan-default-storage-policy
-      - name: defaultVolumeSnapshotClass
-        value: vol-snapclass-foo
-      - name: kubeAPIServerFQDNs
-        value: [demo.fqdn.com, test.fqdn.com]
-      - name: nodePoolLabels
+          name: ""                                           # OPTIONAL, string
+          namespace: ""                                      # OPTIONAL, string
+          data: ""                                           # OPTIONAL, string
+      - name: defaultStorageClass                            # OPTIONAL, string
+        value: "vsan-default-storage-policy"
+      - name: defaultVolumeSnapshotClass                     # OPTIONAL, string
+        value: "vol-snapclass-foo"
+      - name: kubeAPIServerFQDNs                             # OPTIONAL
+        value: ["demo.fqdn.com", "test.fqdn.com"]            # OPTIONAL, string
+      - name: nodePoolLabels                                 # OPTIONAL
         value:
-          - key: tenant 
-            value: tenant-foo
-          - key: organization
-            value: engineering
-          - key: managed
-            value: ""
-      - name: nodePoolTaints
+        - key: "tenant"                                      # OPTIONAL, string
+          value: "tenant-foo"                                # OPTIONAL, string
+        - key: "organization"                                # OPTIONAL, string
+          value: "engineering"                               # OPTIONAL, string
+        - key: "managed"                                     # OPTIONAL, string
+          value: ""                                          # OPTIONAL, string
+      - name: nodePoolTaints                                 # OPTIONAL
         value: 
-      - name: nodePoolVolumes
-        value:
-        - capacity:
-            storage: "15Gi"
-          mountPath: "/var/lib/containerd"
-          name: containerd
-          storageClass: vsan-default-storage-policy
-        - capacity:
-            storage: "15Gi"
-          mountPath: "/var/lib/kubelet"
-          name: kubelet
-          storageClass: vsan-default-storage-policy
-      - name: ntp
-        value: ntp.vmware.com
-      - name: podSecurityStandard
-        value:
-          audit: restricted
-          auditVersion: latest
-          enforce: privileged
-          enforceVersion: latest
-          warn: privileged
-          warnVersion: latest 
-      - name: proxy
-        value:
-          httpProxy: http://1.2.3.4:2139
-          httpsProxy: http://1.2.3.4:2139
-          noProxy: ["no.proxy.test1", "no.proxy.test2"] 
-      - name: storageClass
-        value: vsan-default-storage-policy
-      - name: storageClasses
-        value: [vsan-default-storage-policy, vsan-default-storage-policy-1]
-      - name: trust
-        value:
+        - key: "key1"                                        # OPTIONAL, string
+          value: "value1"                                    # OPTIONAL, string
+          effect: "NoSchedule"                               # OPTIONAL, string
+          timeAdded: 0                                       # OPTIONAL, integer (epoch)
+      - name: nodePoolVolumes                                # OPTIONAL
+        value: 
+        - name: "containerd"                                 # OPTIONAL, string
+          mountPath: "/var/lib/containerd"                   # OPTIONAL, string
+          storageClass: "vsan-default-storage-policy"        # OPTIONAL, string
+          capacity:
+            storage: "15Gi"                                  # OPTIONAL, string
+        - name: "kubelet"                                    # OPTIONAL, string
+          mountPath: "/var/lib/kubelet"                      # OPTIONAL, string
+          storageClass: "vsan-default-storage-policy"        # OPTIONAL, string
+          capacity:
+            storage: "15Gi"                                  # OPTIONAL, string
+      - name: ntp                                            # OPTIONAL, string
+        value: "ntp.vmware.com"
+      - name: podSecurityStandard                            # OPTIONAL
+        value: 
+          audit: "restricted"                                # OPTIONAL, enum: "", privileged, baseline, restricted
+          auditVersion: "latest"                             # OPTIONAL, string
+          enforce: "restricted"                              # OPTIONAL, enum: "", privileged, baseline, restricted
+          enforceVersion: "latest"                           # OPTIONAL, string
+          warn: "restricted"                                 # OPTIONAL, enum: "", privileged, baseline, restricted
+          warnVersion: "latest"                              # OPTIONAL, string
+          deactivated: false                                 # OPTIONAL, boolean
+          exemptions:
+            namespaces: []                                   # OPTIONAL, string
+      - name: proxy                                          # OPTIONAL
+        value: 
+          httpProxy: "http://1.2.3.4:2139"                   # OPTIONAL, string
+          httpsProxy: "http://1.2.3.4:2139"                  # OPTIONAL, string
+          noProxy: ["no.proxy.test1", "no.proxy.test2"]      # OPTIONAL, string
+      - name: storageClass                                   # REQUIRED, string, must be set
+        value: "vsan-default-storage-policy"
+      - name: storageClasses                                 # OPTIONAL
+        value: ["vsan-default-storage-policy","vsan-default-storage-policy-1"]  # OPTIONAL, string
+      - name: trust                                          # OPTIONAL
+        value: 
           additionalTrustedCAs:
-          - name: harbor-ca-1
-      - name: user
+            - name: "harbor-ca-1"                            # OPTIONAL, string
+      - name: user                                           # OPTIONAL
         value: 
-      - name: vmClass
-        value: best-effort-small
-      - name: volumeSnapshotClasses
-        value: [vol-snapclass-foo, vol-snapclass-bar]
+          sshAuthorizedKey: "sshAuthorizedKeyTest..."        # OPTIONAL, string
+          passwordSecret:
+            name: "user-secret-name"                         # OPTIONAL, string
+            key: "user-secret-key"                           # OPTIONAL, string
+      - name: vmClass                                        # REQUIRED, string, must be set
+        value: "best-effort-medium"
+      - name: volumeSnapshotClasses                          # OPTIONAL
+        value: ["vol-snapclass-foo", "vol-snapclass-bar"]    # OPTIONAL, string
 ```
