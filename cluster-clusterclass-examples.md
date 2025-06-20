@@ -1,9 +1,9 @@
 
-You can use the example below as a guideline to build your VKS cluster manifest. The cluster spec could be broken down into two parts - 
+You can use the example below as a guideline to build your VKS cluster manifest. For a complete detail on the v1beta1 cluster object details, please visit this website[https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere-supervisor/8-0/using-tkg-service-with-vsphere-supervisor/provisioning-tkg-service-clusters/using-the-cluster-v1beta1-api/cluster-v1beta1-api.html].  The cluster spec could be broken down into two parts - 
 * The general spec and the topology describing the control plane and worker node pools.
 * The clusterclass variables spec that defines a list of key-value pairs that can be used to add additional configuration to the cluster. This section depends on the version of clusterclass that has been defined in the `spec.topology.class` section. Depending on the version being used, you can refer to the example provided in the relevant section.
 
-Where possible, we have provided an exhaustive list of available variables. We have provided some default variables and commented out optional sections. To build a cluster manifest for your environment - 
+Where possible, we have provided an exhaustive list of available variables. We have provided some default values (and some sample values) and commented out optional sections. To build a cluster manifest for your environment - 
 * Copy the first yaml in this document (section 1),
 * Modify the values as per your environment, 
 * Depending on the cluster class version that will be used, copy the relevant clusterclass from section 2 and append it to the end of the first yaml.
