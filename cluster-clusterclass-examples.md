@@ -106,99 +106,292 @@ spec:
 ### `class: builtin-generic-v3.4.0`
 
 ```yaml
-to add
+      - name: kubernetes                                    # OPTIONAL, cluster-wide config
+        value: 
+          certificateRotation:                               # OPTIONAL
+            enabled: true                                    # OPTIONAL, default: true
+            renewalDaysBeforeExpiry: 90                      # OPTIONAL, default: 90, min: 7
+          endpointFQDNs: ["demo.fqdn.com", "test.fqdn.com"]  # OPTIONAL, string, e.g., "k8s.prod.example.com"
+          security:                                          # OPTIONAL
+            podSecurityStandard:                             # OPTIONAL
+              audit: "privilaged"                            # OPTIONAL, enum: "", privileged, baseline, restricted
+              auditVersion: "latest"                         # OPTIONAL, e.g., "v1.31"
+              enforce: "privilaged"                          # OPTIONAL, enum: "", privileged, baseline, restricted
+              enforceVersion: "latest"                       # OPTIONAL, e.g., "v1.31"
+              warn: "privilaged"                             # OPTIONAL, enum: "", privileged, baseline, restricted
+              warnVersion: "latest"                          # OPTIONAL, e.g., "v1.31"
+              deactivated: false                             # OPTIONAL, default: false
+              exemptions:
+                namespaces: []                               # OPTIONAL, string, namespace to exempt
+      - name: node                                           # OPTIONAL, per-node config
+        value: 
+          labels:                                            # OPTIONAL, key:value map
+            tenant: tenant-foo
+            organization: engineering
+            managed: ""
+          taints:                                            # OPTIONAL, list of taints
+            - key: key1                                      # REQUIRED for each taint
+              value: value1                                  # REQUIRED for each taint
+              effect: NoSchedule                             # REQUIRED for each taint, enum: NoSchedule, PreferNoSchedule, NoExecute
+      - name: osConfiguration                                # OPTIONAL
+        value: 
+          directoryJoin:                                     # OPTIONAL, Windows only
+            credentialSecretRef: ""                          # REQUIRED if directoryJoin is set
+            domain: "my-ad.domain.com"                       # REQUIRED if directoryJoin is set
+            gmsaControlSecurityGroupDN: ""                   # OPTIONAL
+            organizationalUnitDN: ""                         # OPTIONAL
+          fips:                                              # OPTIONAL
+            enabled: false                                   # OPTIONAL, default: false
+          ntp:                                               # OPTIONAL
+            servers: ["ntp1.vmware.com", "ntp2.vmware.com"]  # REQUIRED if ntp is set IP/FQDN
+          sshd:                                              # OPTIONAL
+            banner: "SECURITY WANRNING...."                  # OPTIONAL, string, login banner
+          systemProxy:                                       # OPTIONAL
+            http: "http://1.2.3.4:2139"                      # REQUIRED if systemProxy is set, string
+            https: "http://1.2.3.4:2139"                     # REQUIRED if systemProxy is set, string
+            noProxy: ["no.proxy.test1" , "no.proxy.test2"]   # REQUIRED if systemProxy is set, string
+          trust:                                             # OPTIONAL
+            additionalTrustedCAs:                            # REQUIRED if trust is set
+              - caCert:
+                  secretRef:                                 # OPTIONAL alternative
+                    name: "trust-ca-secret-1"                # REQUIRED if secretRef used
+                    key: "trust-ca-test1"                    # REQUIRED if secretRef used
+              - caCert:
+                  content: |-                                # OPTIONAL, inline PEM content
+                    ------BEGIN CERTIFICATE-----
+                    MII.....
+                    EXJHDJKSDsd
+                    MII.....
+                    ------END CERTIFICATE-----
+          ubuntuPro:
+            tokenSecretRef: ""                               # REQUIRED if ubuntuPro is set
+            services: []                                     # OPTIONAL, service names
+            settings:
+              - key: ""                                      # REQUIRED for each setting
+                value: ""                                    # REQUIRED for each setting
+          user:
+            user: "vmware-system-user"                       # REQUIRED, string, e.g., "vmware-system-user"
+            sshAuthorizedKey: "sshAuthorizedKeyTest..."      # OPTIONAL, must have at least sshAuthorizedKey or passwordSecret if user is set
+            password:
+              renewalDaysBeforeExpiry: 7                     # OPTIONAL, default 7
+            passwordSecret:
+              name: "user-secret-key"                        # REQUIRED if passwordSecret used
+              key: "user-secret-name"                        # REQUIRED if passwordSecret used
+      - name: resourceConfiguration                          # OPTIONAL
+        value: 
+          systemReserved:                                    # OPTIONAL
+            automatic: false                                 # OPTIONAL, boolean, default: true
+            cpu: "1"                                         # OPTIONAL, string, e.g., "1"
+            memory: "1024Mi"                                 # OPTIONAL, string, e.g., "4096Mi"
+      - name: storageClass                                   # REQUIRED, root volume StorageClass, e.g., "fast-ssd"
+        value: "vsan-default-storage-policy"
+      - name: vmClass                                        # REQUIRED, VMClass name for VM sizing, e.g., "best-effort-medium"
+        value: "best-effort-medium"
+      - name: volumes                                        # OPTIONAL, extra attached disks
+        value: 
+          - name: "containerd"                               # REQUIRED for each volume
+            mountPath: "/var/lib/containerd"                 # REQUIRED
+            storageClass: "vsan-default-storage-policy"      # REQUIRED
+            capacity: 15Gi"                                  # REQUIRED, e.g., "20Gi"
+          - name: "kubelet"                                  # REQUIRED for each volume
+            mountPath: "/var/lib/kubelet"                    # REQUIRED
+            storageClass: "vsan-default-storage-policy"      # REQUIRED
+            capacity: 15Gi"                                  # REQUIRED, e.g., "20Gi"
+      - name: vsphereOptions                                 # OPTIONAL, vSphere-specific overrides
+        value: 
+          persistentVolumes:
+            availableStorageClasses: ["vsan-default-storage-policy", "vsan-default-storage-policy-1"]  # OPTIONAL
+            availableVolumeSnapshotClasses: ["vol-snapclass-foo", "vol-snapclass-bar"]                 # OPTIONAL
+            customizableStorageClassAnnotations: []                                                    # OPTIONAL
+            customizableStorageClassLabels: []                                                         # OPTIONAL
+            defaultStorageClass: "vsan-default-storage-policy"                                         # OPTIONAL, sets default
+            defaultVolumeSnapshotClass: "vol-snapclass-foo"                                            # OPTIONAL
 ```
 
 ### `class: builtin-generic-v3.3.0`
 ```yaml
-to add
+      - name: kubernetes                                     # OPTIONAL, cluster-wide config
+        value: 
+          certificateRotation:                               # OPTIONAL
+            enabled: true                                    # OPTIONAL, default: true
+            renewalDaysBeforeExpiry: 90                      # OPTIONAL, default: 90, min: 7
+          endpointFQDNs: ["demo.fqdn.com", "test.fqdn.com"]  # OPTIONAL, string, e.g., "k8s.prod.example.com"
+          security:                                          # OPTIONAL
+            podSecurityStandard:                             # OPTIONAL
+              audit: "privilaged"                            # OPTIONAL, enum: "", privileged, baseline, restricted
+              auditVersion: "latest"                         # OPTIONAL, e.g., "v1.31"
+              enforce: "privilaged"                          # OPTIONAL, enum: "", privileged, baseline, restricted
+              enforceVersion: "latest"                       # OPTIONAL, e.g., "v1.31"
+              warn: "privilaged"                             # OPTIONAL, enum: "", privileged, baseline, restricted
+              warnVersion: "latest"                          # OPTIONAL, e.g., "v1.31"
+              deactivated: false                             # OPTIONAL, default: false
+              exemptions:
+                namespaces: []                               # OPTIONAL, string, namespace to exempt
+      - name: node                                           # OPTIONAL
+        value: 
+          labels:                                            # OPTIONAL, key:value map
+            tenant: tenant-foo
+            organization: engineering
+            managed: ""
+          taints:                                            # OPTIONAL, list of taints
+            - key: key1                                      # REQUIRED for each taint
+              value: value1                                  # REQUIRED for each taint
+              effect: NoSchedule                             # REQUIRED for each taint, enum: NoSchedule, PreferNoSchedule, NoExecute
+      - name: osConfiguration                                # OPTIONAL
+        value: 
+          directoryJoin:                                     # OPTIONAL, Windows only
+            credentialSecretRef: ""                          # REQUIRED if directoryJoin is set
+            domain: "my-ad.domain.com"                       # REQUIRED if directoryJoin is set
+            gmsaControlSecurityGroupDN: ""                   # OPTIONAL
+            organizationalUnitDN: ""                         # OPTIONAL
+          fips:                                              # OPTIONAL
+            enabled: false                                   # OPTIONAL, default: false
+          ntp:                                               # OPTIONAL
+            servers: ["ntp1.vmware.com", "ntp2.vmware.com"]  # REQUIRED if ntp is set IP/FQDN
+          sshd:                                              # OPTIONAL
+            banner: "SECURITY WANRNING...."                  # OPTIONAL, string, login banner
+          systemProxy:                                       # OPTIONAL
+            http: "http://1.2.3.4:2139"                      # REQUIRED if systemProxy is set, string
+            https: "http://1.2.3.4:2139"                     # REQUIRED if systemProxy is set, string
+            noProxy: ["no.proxy.test1" , "no.proxy.test2"]   # REQUIRED if systemProxy is set, string
+          trust:                                             # OPTIONAL
+            additionalTrustedCAs:                            # REQUIRED if trust is set
+              - caCert:
+                  secretRef:                                 # OPTIONAL alternative
+                    name: "trust-ca-secret-1"                # REQUIRED if secretRef used
+                    key: "trust-ca-test1"                    # REQUIRED if secretRef used
+              - caCert:
+                  content: |-                                # OPTIONAL, inline PEM content
+                    ------BEGIN CERTIFICATE-----
+                    MII.....
+                    EXJHDJKSDsd
+                    MII.....
+                    ------END CERTIFICATE-----
+          ubuntuPro:                                         # OPTIONAL, Ubuntu nodes only
+            tokenSecretRef: ""                               # REQUIRED if ubuntuPro is set
+            services: []                                     # OPTIONAL, service names
+            settings:
+              - key: ""                                      # REQUIRED for each setting
+                value: ""                                    # REQUIRED for each setting
+          user:                                              # OPTIONAL
+            user: "vmware-system-user"                               # REQUIRED, string, e.g., "vmware-system-user"
+            sshAuthorizedKey: "sshAuthorizedKeyTest..."      # OPTIONAL, must have at least sshAuthorizedKey or passwordSecret if user is set
+            passwordSecret:
+              name: "user-secret-key"                        # REQUIRED if passwordSecret used
+              key: "user-secret-name"                        # REQUIRED if passwordSecret used
+      - name: resourceConfiguration                          # OPTIONAL
+        value: 
+          systemReserved:                                    # OPTIONAL
+            automatic: false                                 # OPTIONAL, boolean, default: true
+            cpu: "1"                                         # OPTIONAL, string, e.g., "1"
+            memory: "1024Mi"                                 # OPTIONAL, string, e.g., "4096Mi"
+      - name: storageClass                                   # REQUIRED, string, e.g., "fast-ssd"
+        value: "vsan-default-storage-policy"
+      - name: vmClass                                        # REQUIRED, string, e.g., "best-effort-xsmall"
+        value: "best-effort-medium"
+      - name: volumes                                        # OPTIONAL
+        value: 
+          - name: "containerd"                               # REQUIRED for each volume
+            mountPath: "/var/lib/containerd"                 # REQUIRED
+            storageClass: "vsan-default-storage-policy"      # REQUIRED
+            capacity: 15Gi"                                  # REQUIRED, e.g., "20Gi"
+          - name: "kubelet"                                  # REQUIRED for each volume
+            mountPath: "/var/lib/kubelet"                    # REQUIRED
+            storageClass: "vsan-default-storage-policy"      # REQUIRED
+            capacity: 15Gi"                                  # REQUIRED, e.g., "20Gi"
+      - name: vsphereOptions                                 # OPTIONAL
+        value: 
+          persistentVolumes:                                 # OPTIONAL
+            availableStorageClasses: ["vsan-default-storage-policy", "vsan-default-storage-policy-1"]  # OPTIONAL, string
+            availableVolumeSnapshotClasses: ["vol-snapclass-foo", "vol-snapclass-bar"]                 # OPTIONAL, string
+            defaultStorageClass: "vsan-default-storage-policy"                                         # OPTIONAL, string
+            defaultVolumeSnapshotClass: "vol-snapclass-foo"                                            # OPTIONAL, string
 ```
 
 ### `class: builtin-generic-v3.2.0`
 
 ```yaml
-      - name: kubernetes
-        value:
-          certificateRotation:
-            enabled: true
-            renewalDaysBeforeExpiry: 90
-          endpointFQDNs: [demo.fqdn.com, test.fqdn.com]
-          security: 
-            podSecurityStandard:
-              deactivated: false
-              audit: privileged
-              auditVersion: latest
-              enforce: privileged
-              enforceVersion: latest
-              warn: privileged
-              warnVersion: latest
-      - name: node
-        value:
-          labels:
+      - name: kubernetes                                     # OPTIONAL
+        value: 
+          certificateRotation:                               # OPTIONAL
+            enabled: true                                    # OPTIONAL, boolean, default: true
+            renewalDaysBeforeExpiry: 90                      # OPTIONAL, int, default: 90, min: 7
+          endpointFQDNs: ["demo.fqdn.com", "test.fqdn.com"]  # OPTIONAL, string, FQDN alias for control plane
+          security:                                          # OPTIONAL
+            podSecurityStandard:                             # OPTIONAL
+              audit: privilaged                              # OPTIONAL, enum: "", privileged, baseline, restricted
+              auditVersion: latest                           # OPTIONAL, string, e.g., "v1.31"
+              enforce: privilaged                            # OPTIONAL, enum: "", privileged, baseline, restricted
+              enforceVersion: latest                         # OPTIONAL, string
+              warn: privilaged                               # OPTIONAL, enum: "", privileged, baseline, restricted
+              warnVersion: latest                            # OPTIONAL, string
+              deactivated: false                             # OPTIONAL, boolean, default: false
+              exemptions:                                    # OPTIONAL
+                namespaces: []                               # OPTIONAL, string, namespace to exempt
+      - name: node                                           # OPTIONAL
+        value: 
+          labels:                                            # OPTIONAL, map of key:value
             tenant: tenant-foo
             organization: engineering
             managed: ""
-          taints:
-          - key: key1
-            value: value1
-            effect: NoSchedule
-          - key: key2
-            value: value2
-            effect: NoExecute            
-      - name: osConfiguration
-        value:
-          ntp:
-            servers: [ntp.vmware.com]
-          systemProxy:
-            http: http://1.2.3.4:2139
-            https: http://4.3.2.1:2139
-            noProxy: ["no.proxy.test1" , "no.proxy.test2"] 
-          trust:
-            additionalTrustedCAs:
-            - caCert:
-                secretRef:
-                  key: trust-ca-test1
-                  name: "trust-ca-secret-1"
-            - caCert:
-                content: |-
-                  -----BEGIN CERTIFICATE-----
-                  MIIEczCCA1ugAwIBAgIBADANBgkqhkiG9w0BAQQFAD..AkGA1UEBhMCR0Ix
-                  EzARBgNVBAgTClNvbWUtU3RhdGUxFDASBgNVBAoTC0..0EgTHRkMTcwNQYD
-                  ...
-                  -----END CERTIFICATE-----
-          user:
-            passwordSecret:
-              key: user-secret-key-test
-              name: user-secret-name-test
-            sshAuthorizedKey: sshAuthorizedKeyTest...
-            user: customuser 
-      - name: resourceConfiguration
-        value:
-          systemReserved:
-            cpu: 1
-            memory: 4G
-            automatic: false
-      - name: storageClass
-        value: vsan-default-storage-policy
-      - name: vmClass
-        value: best-effort-small
-      - name: volumes
+          taints:                                            # OPTIONAL
+            - key: key1                                      # REQUIRED for each taint
+              value: value1                                  # REQUIRED for each taint
+              effect: NoSchedule                             # REQUIRED for each taint, enum: NoSchedule, PreferNoSchedule, NoExecute
+      - name: osConfiguration                                # OPTIONAL
         value: 
-        - name: containerd
-          mountPath: /var/lib/containerd
-          storageClass: vsan-default-storage-policy
-          capacity: 15Gi
-        - name: kubelet
-          mountPath: /var/lib/kubelet
-          storageClass: vsan-default-storage-policy
-          capacity: 15Gi
-      - name: vsphereOptions
-        value:
-          persistentVolumes:
-            availableStorageClasses: [vsan-default-storage-policy, vsan-default-storage-policy-1 ]
-            availableVolumeSnapshotClasses: [vol-snapclass-foo, vol-snapclass-bar]
-            defaultStorageClass: vsan-default-storage-policy
-            defaultVolumeSnapshotClass: vol-snapclass-bar
+          ntp:                                               # OPTIONAL
+            servers: ["ntp1.vmware.com", "ntp2.vmware.com"]  # REQUIRED if ntp is set
+          systemProxy:                                       # OPTIONAL
+            http: "http://1.2.3.4:2139"                      # REQUIRED if systemProxy is set, string
+            https: "http://1.2.3.4:2139"                     # REQUIRED if systemProxy is set, string
+            noProxy: ["no.proxy.test1" , "no.proxy.test2"]   # REQUIRED if systemProxy is set, string
+          trust:                                             # OPTIONAL
+            additionalTrustedCAs:                            # REQUIRED if trust is set
+              - caCert:
+                  secretRef:                                 # OPTIONAL alternative
+                    name: "trust-ca-secret-1"                # REQUIRED if secretRef used
+                    key: "trust-ca-test1"                    # REQUIRED if secretRef used. Value needs to be double base64 encoded.
+              - caCert:
+                  content: |-                                # OPTIONAL, inline PEM content
+                    ------BEGIN CERTIFICATE-----
+                    MII.....
+                    EXJHDJKSDsd
+                    MII.....
+                    ------END CERTIFICATE-----
+          user:                                              # OPTIONAL
+            user: "vmware-system-user"                       # REQUIRED, string, e.g., "vmware-system-user"
+            sshAuthorizedKey: "sshAuthorizedKeyTest..."      # OPTIONAL, must have at least sshAuthorizedKey or passwordSecret if user is set
+            passwordSecret:
+              name: "user-secret-key"                        # REQUIRED if passwordSecret used
+              key: "user-secret-name"                        # REQUIRED if passwordSecret used
+      - name: resourceConfiguration                          # OPTIONAL
+        value: 
+          systemReserved:                                    # OPTIONAL
+            automatic: false                                 # OPTIONAL, boolean, default: true
+            cpu: "1"                                         # OPTIONAL, string, e.g., "1"
+            memory: "1024Mi"                                 # OPTIONAL, string, e.g., "4096Mi"
+      - name: storageClass                                   # REQUIRED, string, root disk storage class
+        value: "vsan-default-storage-policy"
+      - name: vmClass                                        # REQUIRED, string, VM class for compute shape
+        value: "best-effort-medium"
+      - name: volumes                                        # OPTIONAL
+        value: 
+          - name: "containerd"                               # REQUIRED for each volume
+            mountPath: "/var/lib/containerd"                 # REQUIRED
+            storageClass: "vsan-default-storage-policy"      # REQUIRED
+            capacity: 15Gi"                                  # REQUIRED, e.g., "20Gi"
+          - name: "kubelet"                                  # REQUIRED for each volume
+            mountPath: "/var/lib/kubelet"                    # REQUIRED
+            storageClass: "vsan-default-storage-policy"      # REQUIRED
+            capacity: 15Gi"                                  # REQUIRED, e.g., "20Gi"
+      - name: vsphereOptions                                 # OPTIONAL
+        value: 
+          persistentVolumes:                                                                           # OPTIONAL
+            availableStorageClasses: ["vsan-default-storage-policy","vsan-default-storage-policy-1" ]  # OPTIONAL, string
+            availableVolumeSnapshotClasses: ["vol-snapclass-foo", "vol-snapclass-bar"]                 # OPTIONAL, string
+            defaultStorageClass: "vsan-default-storage-policy"                                         # OPTIONAL, string
+            defaultVolumeSnapshotClass: "vol-snapclass-foo"                                            # OPTIONAL, string
 ```
 
 ### `class: tanzukubernetescluster` or `class: builtin-generic-v3.1.0`
